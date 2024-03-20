@@ -63,7 +63,7 @@ public class GamePanel extends JPanel implements ActionListener{
 			camera.move(bird.getCenter());
 
 			for(int i = 0 ; i < num_enemies; i++){
-				enemies.get(i).pathFinding((int)bird.getCenter().x, (int)bird.getCenter().y, enemies);
+				enemies.get(i).pathFinding(bird.getCenter(), enemies);
 				enemies.get(i).move();
 			}
 

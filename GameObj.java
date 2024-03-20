@@ -16,9 +16,9 @@ public class GameObj {
         return Math.sqrt((x.x-y.x)*(x.x-y.x) + (x.y-y.y)*(x.y-y.y));
     }
 
-    public void knockBack(Vec2d target){
-        speed.x += target.x;
-        speed.y += target.y;
+    public void knockBack(Vec2d hitter_speed){
+        speed.x += hitter_speed.x;
+        speed.y += hitter_speed.y;
         //normalize();
     }
 
@@ -26,8 +26,8 @@ public class GameObj {
         return new Vec2d(this.pos.x + this.size/2,this.pos.y + this.size/2); 
     }
 
-    public double normalize(double x, double y){
-        double l = Math.sqrt(x*x + y*y);
+    public double normalize(Vec2d vector){
+        double l = Math.sqrt(vector.x*vector.x + vector.y*vector.y);
         if (l > MAXSPEED)
             return  MAXSPEED/l;
         return 1;
