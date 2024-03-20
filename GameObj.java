@@ -1,7 +1,7 @@
 public class GameObj {
     protected double cattrito = 0.04;
     protected int MAXSPEED = 10;
-    protected double MINSPEED = 3;
+    protected double MINSPEED = 0.4;
 	public int skipFrames = 0;
     public Vec2d pos, speed, acc;
     public double size;
@@ -11,6 +11,10 @@ public class GameObj {
         this.acc = acc;
         this.pos = pos;
         this.size = size;
+    }
+
+    public double distance(Vec2d x, Vec2d y){// trova distanza di x da y 
+        return Math.sqrt((x.x-y.x)*(x.x-y.x) + (x.y-y.y)*(x.y-y.y));
     }
 
     public void knockBack(double x, double y){
@@ -42,6 +46,7 @@ public class GameObj {
         speed.x = speed.x + acc.x;
         speed.y = speed.y + acc.y;
 
+
         normalize();
 
 		Vec2d friction = new Vec2d(-cattrito * speed.x, -cattrito*speed.y);
@@ -49,9 +54,9 @@ public class GameObj {
         speed.x += friction.x;
         speed.y += friction.y;
 
+
 		if (Math.abs(speed.x) < MINSPEED)speed.x = 0;
 		if (Math.abs(speed.y) < MINSPEED)speed.y = 0;
-
 
 		this.pos.x += speed.x;
 		this.pos.y += speed.y;

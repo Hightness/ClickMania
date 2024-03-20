@@ -4,11 +4,11 @@ public class Bird extends GameObj {
         super(pos, speed, acc, size);
 	}
 
-    public void fired; 
-
 	public void move(boolean up, boolean down, boolean left, boolean right){
-        //System.out.println(up+" " + down + " "+left+" "+right);
-        int accy = 0, accx = 0;
+        System.out.println(up+" " + down + " "+left+" "+right);
+        System.out.println(speed.x + " " + speed.y);
+
+        double accy = 0, accx = 0;
 
 		if (up)
             accy -= 1.0;

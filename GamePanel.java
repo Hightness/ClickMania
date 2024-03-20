@@ -20,7 +20,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	//Bullet bullet;
 	Random rand = new Random();
 	ArrayList<Enemy> enemies = new ArrayList<>();
-	int num_enemies = 25;
+	int num_enemies = 15;
 	
 
 
@@ -75,6 +75,7 @@ public class GamePanel extends JPanel implements ActionListener{
 			}
 
 			checkCollisions();
+
 			g.drawImage(mappa, -(int)camera.pos.x, -(int)camera.pos.y, mappa.getWidth(null)*10, mappa.getHeight(null)*10, this);
 
 			for (Enemy enemy : enemies){
