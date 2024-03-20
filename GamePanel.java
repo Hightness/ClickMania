@@ -12,7 +12,8 @@ public class GamePanel extends JPanel implements ActionListener{
 	//Vec2d enemy1Center = new Vec2d(enemy1Pos.x+UNIT_SIZE, enemy1Pos.y + UNIT_SIZE);
 	//double enemy1Size = 2*UNIT_SIZE;
 	Bird bird ;
-	boolean game_running, P_up, P_down, P_left, P_right;
+	int P_up, P_down, P_left, P_right, num_enemies = 15;
+	boolean game_running;
 	Image mappa;
 	Camera camera;
 	Vec2d mouse_coord;
@@ -20,7 +21,6 @@ public class GamePanel extends JPanel implements ActionListener{
 	//Bullet bullet;
 	Random rand = new Random();
 	ArrayList<Enemy> enemies = new ArrayList<>();
-	int num_enemies = 15;
 	
 
 
@@ -40,7 +40,7 @@ public class GamePanel extends JPanel implements ActionListener{
 
 		//bullet new Bullet(owner)
 
-		P_up = P_down = P_left = P_right = false;
+		P_up = P_down = P_left = P_right = 0;
 
 		enemies.clear();
 
@@ -59,23 +59,17 @@ public class GamePanel extends JPanel implements ActionListener{
 
 	public void draw(Graphics g) {
 		if(game_running) {
-
-			if (bird.skipFrames == 0){
-				bird.move(P_up, P_down, P_left, P_right);
-				camera.move(bird.pos.x, bird.pos.y);
-			}
-			else{
-				bird.move();
-				camera.move(bird.pos.x, bird.pos.y);
-				bird.skipFrames -= 1;
-			}
+			bird.move(P_up, P_down, P_left, P_right);
+			camera.move(bird.getCenter());
 
 			for(int i = 0 ; i < num_enemies; i++){
 				enemies.get(i).pathFinding((int)bird.getCenter().x, (int)bird.getCenter().y, enemies);
+				enemies.get(i).move();
 			}
 
 			checkCollisions();
 
+			//disegna la mappa
 			g.drawImage(mappa, -(int)camera.pos.x, -(int)camera.pos.y, mappa.getWidth(null)*10, mappa.getHeight(null)*10, this);
 
 			for (Enemy enemy : enemies){
@@ -86,7 +80,6 @@ public class GamePanel extends JPanel implements ActionListener{
 			g.setColor(Color.red);
 			g.fillOval((int)bird.pos.x - (int)camera.pos.x, (int)bird.pos.y - (int)camera.pos.y, (int)bird.size, (int)bird.size);
 		}
-
 		else {
 			gameOver(g);
 			timer.stop();			
@@ -94,15 +87,16 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 
 	public void checkCollisions() {
+		//Collision with walls
 		if(bird.pos.y + UNIT_SIZE >= SCREEN_HEIGHT*3 || bird.pos.y <= 0 || bird.pos.x <= 0 || bird.pos.x + UNIT_SIZE >= SCREEN_WIDTH*3){
 			//game_running=false;
 		}
 
+		//Collision with enemies
 		for (Enemy enemy : enemies){
 			double distance = Math.sqrt((bird.getCenter().x-enemy.getCenter().x)*(bird.getCenter().x-enemy.getCenter().x)+(bird.getCenter().y-enemy.getCenter().y)*(bird.getCenter().y-enemy.getCenter().y));
-
-			if(distance <= bird.size/2 + enemy.size/2 && bird.skipFrames == 0){
-				bird.knockBack(enemy.speed.x*3, enemy.speed.y*3);
+			if(distance <= bird.size/2 + enemy.size/2){
+				bird.knockBack(new Vec2d(enemy.speed.x*3, enemy.speed.y*3));
 				//game_running=false;
 			}
 		}
@@ -114,8 +108,6 @@ public class GamePanel extends JPanel implements ActionListener{
 		g.setColor(Color.red);
 		g.setFont( new Font("Ink Free",Font.BOLD, 40));
 		FontMetrics metrics1 = getFontMetrics(g.getFont());
-		//g.drawString("Score: "+applesEaten, (SCREEN_WIDTH - metrics1.stringWidth("Score: "+applesEaten))/2, g.getFont().getSize());
-		//Game Over text
 		g.setColor(Color.red);
 		g.setFont( new Font("Ink Free",Font.BOLD, 75));
 		FontMetrics metrics2 = getFontMetrics(g.getFont());
@@ -149,33 +141,32 @@ public class GamePanel extends JPanel implements ActionListener{
 				timer.stop();
 
 			if (e.getKeyCode() == KeyEvent.VK_W)
-				P_up = true;
+				P_up = 1;
 
 			if (e.getKeyCode() == KeyEvent.VK_A)
-				P_left = true;
+				P_left = 1;
 
 			if (e.getKeyCode() == KeyEvent.VK_S)
-				P_down = true;
+				P_down = 1;
 
 			if (e.getKeyCode() == KeyEvent.VK_D)
-				P_right = true;
+				P_right = 1;
 
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e){
 			if (e.getKeyCode() == KeyEvent.VK_W)
-				P_up = false;
+				P_up = 0;
 
 			if (e.getKeyCode() == KeyEvent.VK_A)
-				P_left = false;
+				P_left = 0;
 
 			if (e.getKeyCode() == KeyEvent.VK_S)
-				P_down = false;
+				P_down = 0;
 
 			if (e.getKeyCode() == KeyEvent.VK_D)
-				P_right = false;
-
+				P_right = 0;
 		}
 	}
 }

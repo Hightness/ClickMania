@@ -1,7 +1,6 @@
 import javax.swing.JFrame;
 
 public class Vec2d {
-
     public double x;
     public double y;
 

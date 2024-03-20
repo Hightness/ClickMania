@@ -3,7 +3,6 @@ import java.util.Random;
 
 public class Enemy extends GameObj {
 	Random rand = new Random();
-	public int skipFrames = 0;
 
 	Enemy(Vec2d pos, Vec2d speed, Vec2d acc, double size){
         super(pos, speed, acc, size);
@@ -31,6 +30,8 @@ public class Enemy extends GameObj {
 				closest_enemy = enemy;
 			}
 		}
+
+
 		if(best_distance != 10000000 && best_distance < distance(new Vec2d(x,y), getCenter())){
 				vel_player_dir_x += closest_enemy.speed.x;
 				vel_player_dir_y += closest_enemy.speed.y;
@@ -40,6 +41,5 @@ public class Enemy extends GameObj {
 
 		acc.x = vel_player_dir_x*n;
 		acc.y = vel_player_dir_y*n;
-		move();
 	}
 }

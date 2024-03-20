@@ -3,7 +3,7 @@ import javax.swing.JFrame;
 public class GameFrame extends JFrame{
 
 	GameFrame(){
-		this.setTitle("Prova");
+		this.setTitle("ClickMania");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(true);
 		this.pack();

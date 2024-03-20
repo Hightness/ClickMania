@@ -1,10 +1,9 @@
-
 public class DGam {
 
 	public static void main(String[] args) {
-		GamePanel pane1=new GamePanel();
+		GamePanel pane=new GamePanel();
 		GameFrame frame=new GameFrame();
-		frame.add(pane1);
+		frame.add(pane);
 	}
 
 }
