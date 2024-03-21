@@ -1,4 +1,3 @@
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -10,7 +9,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	static final int DELAY = 20;
 
 	Bird bird ;
-	int num_enemies = 15;
+	int P_up, P_down, P_left, P_right, num_enemies = 15;
 	boolean game_running;
 	Image mappa;
 	Camera camera;
@@ -25,7 +24,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		this.setPreferredSize(new Dimension(500 , 500));
 		this.setBackground(Color.black);
 		this.setFocusable(true);
-		this.addKeyListener(new MyKeyListener());
+		this.addKeyListener(new MyKeyAdapter());
 		this.addMouseListener(new MyMouseListener());
 		startGame();
 	}
@@ -35,6 +34,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		double MAXSPEED = rand.nextInt(6) + 4;
 		double SIZE = rand.nextInt(UNIT_SIZE/2) + UNIT_SIZE;
 		camera = new Camera(new Vec2d(0,0), new Vec2d(0,0), new Vec2d(0,0), MAXSPEED, MINSPEED);
+		P_up = P_down = P_left = P_right = 0;
 		mappa = new ImageIcon("background.jpeg").getImage();
 
 		bird = new Bird(new Vec2d((int)(UNIT_SIZE + 50), (int)(UNIT_SIZE + 50)) , new Vec2d(0,0), new Vec2d(0,0)
@@ -49,7 +49,7 @@ public class GamePanel extends JPanel implements ActionListener{
 						new Vec2d(0,0), new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED));
 		}
 
-		System.out.println("game starteed");
+		System.out.println("game started");
 		game_running = true;
 	}
 
@@ -61,10 +61,10 @@ public class GamePanel extends JPanel implements ActionListener{
 	public void draw(Graphics g) {
 		if(game_running) {
 
-			//bird.move(P_up, P_down, P_left, P_right);
+			bird.move(P_up, P_down, P_left, P_right);
 			camera.follow(bird.getCenter(), getHeight(), getWidth());
 			bird.checkCollisions(enemies, mappa);
-			//enemies.add(bird);
+			enemies.add(bird);
 
 			for(int i = 0 ; i < num_enemies; i++){
 				enemies.get(i).pathFinding(bird, enemies);
@@ -72,7 +72,7 @@ public class GamePanel extends JPanel implements ActionListener{
 				enemies.get(i).move();
 			}
 
-			//enemies.remove(enemies.size()-1);
+			enemies.remove(enemies.size-1);
 
 			//disegna la mappa
 			g.drawImage(mappa, -(int)camera.pos.x, -(int)camera.pos.y, mappa.getWidth(null)*10, mappa.getHeight(null)*10, this);
@@ -117,6 +117,47 @@ public class GamePanel extends JPanel implements ActionListener{
 		}
 	}
 	
+	public class MyKeyAdapter extends KeyAdapter{
 
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER){
+				if (!game_running)
+					startGame();
+				timer.start();
+			}
+
+			if (e.getKeyCode() == KeyEvent.VK_SHIFT)
+				timer.stop();
+
+			if (e.getKeyCode() == KeyEvent.VK_W)
+				P_up = 1;
+
+			if (e.getKeyCode() == KeyEvent.VK_A)
+				P_left = 1;
+
+			if (e.getKeyCode() == KeyEvent.VK_S)
+				P_down = 1;
+
+			if (e.getKeyCode() == KeyEvent.VK_D)
+				P_right = 1;
+
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e){
+			if (e.getKeyCode() == KeyEvent.VK_W)
+				P_up = 0;
+
+			if (e.getKeyCode() == KeyEvent.VK_A)
+				P_left = 0;
+
+			if (e.getKeyCode() == KeyEvent.VK_S)
+				P_down = 0;
+
+			if (e.getKeyCode() == KeyEvent.VK_D)
+				P_right = 0;
+		}
+	}
 }
 
