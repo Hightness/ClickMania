@@ -15,26 +15,20 @@ public class Enemy extends GameObj {
 		double	distanza_target = getCenter().distance(target.getCenter()) - this.size/2 - target.size/2;
 
 		Vec2d player_dir = getCenter().getDirection(target.getCenter()).getVersor();
-		//Vec2d player_repulsion = player_dir.clone().getVersor();
-
-		//player_repulsion.flipDirection();
 
 		Vec2d pd_rotated = player_dir.clone().getVersor();
 		pd_rotated.rotate90C();
-
-		//player_repulsion.multiply(Math.pow(attackArea/distanza_target, 2));
 
 		player_dir.multiply(Math.pow(distanza_target/attackArea, 2));
 
 		pd_rotated.multiply(attackArea/distanza_target);
 
-		//pd_rotated.add(player_repulsion);
 		player_dir.add(pd_rotated);
 		this.speed.add(player_dir);
 
 		this.speed.normalize(MAXSPEED);
 
-		//acc.x = player_dir.x;
-		//acc.y = player_dir.y;
+		acc.x = player_dir.x;
+		acc.y = player_dir.y;
 	}
 }

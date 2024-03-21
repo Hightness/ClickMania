@@ -44,9 +44,11 @@ public class GameObj {
 
 			new_dir.add(repulsion_vector);
 		}
+        this.acc = speed.clone();
+        this.acc.add(new_dir);
 
-        this.speed.add(new_dir);
-		this.speed.normalize(MAXSPEED);
+        //this.speed.add(new_dir);
+		//this.speed.normalize(MAXSPEED);
 	}
 
     public Vec2d getCenter(){
