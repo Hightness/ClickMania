@@ -6,11 +6,8 @@ import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements ActionListener{
 	static final int UNIT_SIZE = 50;
-	static final int SCREEN_WIDTH = 500;
-	static final int SCREEN_HEIGHT = 500;
 	static final int DELAY = 20;
-	//Vec2d enemy1Center = new Vec2d(enemy1Pos.x+UNIT_SIZE, enemy1Pos.y + UNIT_SIZE);
-	//double enemy1Size = 2*UNIT_SIZE;
+
 	Bird bird ;
 	int P_up, P_down, P_left, P_right, num_enemies = 15;
 	boolean game_running;
@@ -18,14 +15,13 @@ public class GamePanel extends JPanel implements ActionListener{
 	Camera camera;
 	Vec2d mouse_coord;
 	Timer timer = new Timer(DELAY,this);
-	//Bullet bullet;
 	Random rand = new Random();
 	ArrayList<Enemy> enemies = new ArrayList<>();
 	
 
 
 	GamePanel(){
-		this.setPreferredSize(new Dimension(SCREEN_WIDTH,SCREEN_HEIGHT));
+		this.setPreferredSize(new Dimension(500 , 500));
 		this.setBackground(Color.black);
 		this.setFocusable(true);
 		this.addKeyListener(new MyKeyAdapter());
@@ -37,19 +33,19 @@ public class GamePanel extends JPanel implements ActionListener{
 		double MINSPEED = 0.4;
 		double MAXSPEED = rand.nextInt(6) + 4;
 		double SIZE = rand.nextInt(UNIT_SIZE/2) + UNIT_SIZE;
-		camera = new Camera(new Vec2d(0,0),new Vec2d(0,0),new Vec2d(0,0), SCREEN_WIDTH - UNIT_SIZE/2
-							, SCREEN_HEIGHT - UNIT_SIZE/2, MAXSPEED, MINSPEED);
+		camera = new Camera(new Vec2d(0,0), new Vec2d(0,0), new Vec2d(0,0), MAXSPEED, MINSPEED);
+		P_up = P_down = P_left = P_right = 0;
 		mappa = new ImageIcon("background.jpeg").getImage();
 
 		bird = new Bird(new Vec2d((int)(UNIT_SIZE + 50), (int)(UNIT_SIZE + 50)) , new Vec2d(0,0), new Vec2d(0,0)
 						, UNIT_SIZE, 10, MINSPEED);
-		P_up = P_down = P_left = P_right = 0;
-		enemies.clear();
 
+		enemies.clear();
 		for(int i = 0 ; i < num_enemies; i++){
 			SIZE = rand.nextInt(UNIT_SIZE/2) + UNIT_SIZE/2;
 			MAXSPEED = rand.nextInt(5) + 3;
-			enemies.add(new Enemy(new Vec2d(rand.nextInt(SCREEN_WIDTH*3),rand.nextInt(SCREEN_HEIGHT*3)), 
+
+			enemies.add(new Enemy(new Vec2d(rand.nextInt(mappa.getWidth(null)*10),rand.nextInt(mappa.getHeight(null)*10)), 
 						new Vec2d(0,0), new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED));
 		}
 
@@ -64,15 +60,16 @@ public class GamePanel extends JPanel implements ActionListener{
 
 	public void draw(Graphics g) {
 		if(game_running) {
+
 			bird.move(P_up, P_down, P_left, P_right);
-			camera.move(bird.getCenter());
+			camera.follow(bird.getCenter(), getHeight(), getWidth());
+			//bird.checkCollisions(enemies, mappa);
 
 			for(int i = 0 ; i < num_enemies; i++){
 				enemies.get(i).pathFinding(bird, enemies);
+				enemies.get(i).checkCollisions(enemies, mappa);
 				enemies.get(i).move();
 			}
-
-			//checkCollisions();
 
 			//disegna la mappa
 			g.drawImage(mappa, -(int)camera.pos.x, -(int)camera.pos.y, mappa.getWidth(null)*10, mappa.getHeight(null)*10, this);
@@ -91,23 +88,6 @@ public class GamePanel extends JPanel implements ActionListener{
 		}
 	}
 
-	public void checkCollisions() {
-		//Collision with walls
-		if(bird.pos.y + UNIT_SIZE >= SCREEN_HEIGHT*3 || bird.pos.y <= 0 || bird.pos.x <= 0 || bird.pos.x + UNIT_SIZE >= SCREEN_WIDTH*3){
-			//game_running=false;
-		}
-
-		//Collision with enemies
-		for (Enemy enemy : enemies){
-			double distance = bird.getCenter().distance(enemy.getCenter());
-			double bias = 27;
-			double size_diff = enemy.size / bird.size;
-			if(distance <= bird.size/2 + enemy.size/2 + bias){
-				bird.knockBack(new Vec2d(enemy.speed.x*size_diff, enemy.speed.y*size_diff));
-				enemy.knockBack(new Vec2d(bird.speed.x/size_diff, bird.speed.y/size_diff));
-			}
-		}
-	}
 	
 	public void gameOver(Graphics g) {
 		//Score
@@ -118,7 +98,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		g.setColor(Color.red);
 		g.setFont( new Font("Ink Free",Font.BOLD, 75));
 		FontMetrics metrics2 = getFontMetrics(g.getFont());
-		g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2);
+		g.drawString("Game Over", (getWidth() - metrics2.stringWidth("Game Over"))/2, getHeight()/2);
 	}
 
 	@Override

@@ -12,8 +12,19 @@ public class Vec2d {
     public double distance(Vec2d vector){// trova distanza di x da y 
         return Math.sqrt((vector.x-this.x)*(vector.x-this.x) + (vector.y-this.y)*(vector.y-this.y));
     }
+
     public Vec2d clone(){
         return new Vec2d(this.x, this.y);
+    }
+
+    public void multiply(double a){
+        this.x *= a; 
+        this.y *= a;
+    }
+    
+    public void add(Vec2d vector){
+        this.x += vector.x;
+        this.y += vector.y;
     }
 
     public void flipDirection(){

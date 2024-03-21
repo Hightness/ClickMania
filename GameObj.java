@@ -1,3 +1,9 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.util.Random;
+import java.util.ArrayList;
+
 public class GameObj {
     protected double cattrito = 0.04;
     protected double MAXSPEED = 10;
@@ -14,10 +20,34 @@ public class GameObj {
         this.size = size;
     }
 
-    public void knockBack(Vec2d hitter_speed){
-        speed.x += hitter_speed.x;
-        speed.y += hitter_speed.y;
-    }
+	public void checkCollisions(ArrayList<Enemy> entities, Image mappa) {
+
+		double distanza_target;
+		double repulsion_radius = 70;
+		Vec2d repulsion_vector;
+		Vec2d new_dir = new Vec2d(0,0);
+
+		//Collision with walls
+		if(this.pos.y + this.size >= mappa.getHeight(null) || this.pos.y <= 0 || this.pos.x <= 0 || this.pos.x + this.size >= mappa.getWidth(null)){
+			//game_running=false;
+		}
+
+		//Collision with enemies
+		for(Enemy entity: entities){
+			if (entity.pos.x == this.pos.x && entity.pos.y == this.pos.y)continue;
+
+			distanza_target = entity.getCenter().distance(getCenter()) - entity.size/2 - this.size/2;
+
+			repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor();
+
+			repulsion_vector.multiply(Math.pow((repulsion_radius/distanza_target),2));
+
+			new_dir.add(repulsion_vector);
+		}
+
+        this.speed.add(new_dir);
+		this.speed.normalize(MAXSPEED);
+	}
 
     public Vec2d getCenter(){
         return new Vec2d(this.pos.x + this.size/2,this.pos.y + this.size/2); 
