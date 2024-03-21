@@ -1,8 +1,8 @@
 
 public class Bird extends GameObj {
 
-	Bird(Vec2d pos, Vec2d speed, Vec2d acc, double size){
-        super(pos, speed, acc, size);
+	Bird(Vec2d pos, Vec2d speed, Vec2d acc, double size, double MAXSPEED, double MINSPEED){
+        super(pos, speed, acc, size, MAXSPEED, MINSPEED);
 	}
 
 	public void move(int up, int down, int left, int right){

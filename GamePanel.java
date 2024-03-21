@@ -34,18 +34,21 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 
 	public void startGame() {
-		camera = new Camera(new Vec2d(0,0),new Vec2d(0,0),new Vec2d(0,0), SCREEN_WIDTH - UNIT_SIZE/2, SCREEN_HEIGHT - UNIT_SIZE/2);
+		double MINSPEED = 0.4;
+		double MAXSPEED = rand.nextInt(7);
+		camera = new Camera(new Vec2d(0,0),new Vec2d(0,0),new Vec2d(0,0), SCREEN_WIDTH - UNIT_SIZE/2
+							, SCREEN_HEIGHT - UNIT_SIZE/2, MAXSPEED, MINSPEED);
 		mappa = new ImageIcon("background.jpeg").getImage();
-		bird = new Bird(new Vec2d((int)(UNIT_SIZE + 50), (int)(UNIT_SIZE + 50)) , new Vec2d(0,0), new Vec2d(0,0), UNIT_SIZE);
 
-		//bullet new Bullet(owner)
-
+		bird = new Bird(new Vec2d((int)(UNIT_SIZE + 50), (int)(UNIT_SIZE + 50)) , new Vec2d(0,0), new Vec2d(0,0)
+						, UNIT_SIZE, 8, MINSPEED);
 		P_up = P_down = P_left = P_right = 0;
-
 		enemies.clear();
 
 		for(int i = 0 ; i < num_enemies; i++){
-			enemies.add(new Enemy(new Vec2d(rand.nextInt(SCREEN_WIDTH*3),rand.nextInt(SCREEN_HEIGHT*3)), new Vec2d(0,0), new Vec2d(0,0), UNIT_SIZE/2));
+			MAXSPEED = rand.nextInt(7);
+			enemies.add(new Enemy(new Vec2d(rand.nextInt(SCREEN_WIDTH*3),rand.nextInt(SCREEN_HEIGHT*3)), 
+						new Vec2d(0,0), new Vec2d(0,0), UNIT_SIZE/2, MAXSPEED, MINSPEED));
 		}
 
 		System.out.println("game started");

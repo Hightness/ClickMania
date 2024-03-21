@@ -2,8 +2,8 @@ public class Camera extends GameObj{
 	public int SCREEN_WIDTH;
 	public int SCREEN_HEIGHT;
 
-    Camera(Vec2d pos, Vec2d speed, Vec2d acc, int SCREEN_WIDTH, int SCREEN_HEIGHT){
-        super(pos,speed,acc,0);
+    Camera(Vec2d pos, Vec2d speed, Vec2d acc, int SCREEN_WIDTH, int SCREEN_HEIGHT, double MAXSPEED, double MINSPEED){
+        super(pos,speed,acc,0, MAXSPEED, MINSPEED);
         this.SCREEN_HEIGHT = SCREEN_HEIGHT;
         this.SCREEN_WIDTH = SCREEN_WIDTH;
     }
