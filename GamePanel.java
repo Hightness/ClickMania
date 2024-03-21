@@ -64,7 +64,7 @@ public class GamePanel extends JPanel implements ActionListener{
 			bird.move(P_up, P_down, P_left, P_right);
 			camera.follow(bird.getCenter(), getHeight(), getWidth());
 			bird.checkCollisions(enemies, mappa);
-			enemies.add(bird);
+			//enemies.add(bird);
 
 			for(int i = 0 ; i < num_enemies; i++){
 				enemies.get(i).pathFinding(bird, enemies);
@@ -72,7 +72,7 @@ public class GamePanel extends JPanel implements ActionListener{
 				enemies.get(i).move();
 			}
 
-			enemies.remove(enemies.size-1);
+			//enemies.remove(enemies.size-1);
 
 			//disegna la mappa
 			g.drawImage(mappa, -(int)camera.pos.x, -(int)camera.pos.y, mappa.getWidth(null)*10, mappa.getHeight(null)*10, this);
