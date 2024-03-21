@@ -35,20 +35,22 @@ public class GamePanel extends JPanel implements ActionListener{
 
 	public void startGame() {
 		double MINSPEED = 0.4;
-		double MAXSPEED = rand.nextInt(7);
+		double MAXSPEED = rand.nextInt(6) + 4;
+		double SIZE = rand.nextInt(UNIT_SIZE/2) + UNIT_SIZE;
 		camera = new Camera(new Vec2d(0,0),new Vec2d(0,0),new Vec2d(0,0), SCREEN_WIDTH - UNIT_SIZE/2
 							, SCREEN_HEIGHT - UNIT_SIZE/2, MAXSPEED, MINSPEED);
 		mappa = new ImageIcon("background.jpeg").getImage();
 
 		bird = new Bird(new Vec2d((int)(UNIT_SIZE + 50), (int)(UNIT_SIZE + 50)) , new Vec2d(0,0), new Vec2d(0,0)
-						, UNIT_SIZE, 8, MINSPEED);
+						, UNIT_SIZE, 10, MINSPEED);
 		P_up = P_down = P_left = P_right = 0;
 		enemies.clear();
 
 		for(int i = 0 ; i < num_enemies; i++){
-			MAXSPEED = rand.nextInt(7);
+			SIZE = rand.nextInt(UNIT_SIZE/2) + UNIT_SIZE/2;
+			MAXSPEED = rand.nextInt(5) + 3;
 			enemies.add(new Enemy(new Vec2d(rand.nextInt(SCREEN_WIDTH*3),rand.nextInt(SCREEN_HEIGHT*3)), 
-						new Vec2d(0,0), new Vec2d(0,0), UNIT_SIZE/2, MAXSPEED, MINSPEED));
+						new Vec2d(0,0), new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED));
 		}
 
 		System.out.println("game started");
@@ -66,11 +68,11 @@ public class GamePanel extends JPanel implements ActionListener{
 			camera.move(bird.getCenter());
 
 			for(int i = 0 ; i < num_enemies; i++){
-				enemies.get(i).pathFinding(bird.getCenter(), enemies);
+				enemies.get(i).pathFinding(bird, enemies);
 				enemies.get(i).move();
 			}
 
-			checkCollisions();
+			//checkCollisions();
 
 			//disegna la mappa
 			g.drawImage(mappa, -(int)camera.pos.x, -(int)camera.pos.y, mappa.getWidth(null)*10, mappa.getHeight(null)*10, this);
@@ -97,10 +99,12 @@ public class GamePanel extends JPanel implements ActionListener{
 
 		//Collision with enemies
 		for (Enemy enemy : enemies){
-			double distance = Math.sqrt((bird.getCenter().x-enemy.getCenter().x)*(bird.getCenter().x-enemy.getCenter().x)+(bird.getCenter().y-enemy.getCenter().y)*(bird.getCenter().y-enemy.getCenter().y));
-			if(distance <= bird.size/2 + enemy.size/2){
-				bird.knockBack(new Vec2d(enemy.speed.x*3, enemy.speed.y*3));
-				//game_running=false;
+			double distance = bird.getCenter().distance(enemy.getCenter());
+			double bias = 27;
+			double size_diff = enemy.size / bird.size;
+			if(distance <= bird.size/2 + enemy.size/2 + bias){
+				bird.knockBack(new Vec2d(enemy.speed.x*size_diff, enemy.speed.y*size_diff));
+				enemy.knockBack(new Vec2d(bird.speed.x/size_diff, bird.speed.y/size_diff));
 			}
 		}
 	}

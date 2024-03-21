@@ -12,6 +12,9 @@ public class Vec2d {
     public double distance(Vec2d vector){// trova distanza di x da y 
         return Math.sqrt((vector.x-this.x)*(vector.x-this.x) + (vector.y-this.y)*(vector.y-this.y));
     }
+    public Vec2d clone(){
+        return new Vec2d(this.x, this.y);
+    }
 
     public void flipDirection(){
         this.x = -this.x;
@@ -22,8 +25,17 @@ public class Vec2d {
         return new Vec2d(target.x - this.x, target.y - this.y);
     }
 
+    public double getModule(){
+        return Math.sqrt(this.x*this.x + this.y*this.y);
+    }
+
+    public Vec2d getVersor(){
+        double modulo = getModule();
+        return new Vec2d(this.x/modulo, this.y/modulo);
+    }
+
     public void normalize(double MAXSPEED){
-        double l = Math.sqrt(this.x*this.x + this.y*this.y);
+        double l = getModule();
         if (l > MAXSPEED){
             double n = MAXSPEED/l;
             this.x*=n;
@@ -32,12 +44,14 @@ public class Vec2d {
     }
 
     public void rotate90CC(){
-        this.x = -y;
-        this.y = x;
+        double temp = this.x;
+        this.x = -this.y;
+        this.y = temp;
     }
 
     public void rotate90C(){
-        this.x = y;
-        this.y = -x;
+        double temp = this.x;
+        this.x = this.y;
+        this.y = -temp;
     }
 }
