@@ -1,4 +1,4 @@
-public class Camera extends GameObj{
+public class Camera extends Entity{
 
     Camera(Vec2d pos, Vec2d speed, Vec2d acc, double MAXSPEED, double MINSPEED){
         super(pos,speed,acc,0, MAXSPEED, MINSPEED);
