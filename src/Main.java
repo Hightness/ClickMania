@@ -4,6 +4,7 @@ public class Main{
 		GamePanel pane=new GamePanel();
 		GameFrame frame=new GameFrame();
 		frame.add(pane);
+		pane.requestFocus();
 	}
 
 }

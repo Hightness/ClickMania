@@ -3,6 +3,18 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.Random;
 import java.util.ArrayList;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
+import javafx.stage.Stage;
+import java.io.File;
+import javafx.embed.swing.JFXPanel;
+
+
+
 
 public class GamePanel extends JPanel implements ActionListener{
 
@@ -63,6 +75,8 @@ public class GamePanel extends JPanel implements ActionListener{
 		this.setBackground(Color.black);
 		g.setColor(Color.red);
 		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
+
+		
 	}
 
 	public void draw(Graphics g) {
