@@ -40,8 +40,10 @@ public class Vec2d {
         return Math.sqrt(this.x*this.x + this.y*this.y);
     }
 
-    public Vec2d getVersor(){
+    public Vec2d getVersor(double MINSPEED){
         double modulo = getModule();
+        if (modulo < MINSPEED)
+            return new Vec2d(0, 0);
         return new Vec2d(this.x/modulo, this.y/modulo);
     }
 

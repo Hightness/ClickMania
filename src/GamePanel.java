@@ -5,10 +5,13 @@ import java.util.Random;
 import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements ActionListener{
+
 	static final int UNIT_SIZE = 50;
 	static final int DELAY = 20;
+	static final int BULLET_SPEED = 20;
+	static final int MAX_BULLETS = 150;
 
-	Player player ;
+	Player player;
 	int P_up, P_down, P_left, P_right, num_enemies = 15;
 	boolean game_running = false;
 	Image mappa;
@@ -16,8 +19,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	Timer timer = new Timer(DELAY,this);
 	Random rand = new Random();
 	ArrayList<Enemy> enemies = new ArrayList<>();
-	
-
+	ArrayList<Bullet> bullets = new ArrayList<>();
 
 	GamePanel(){
 		this.setPreferredSize(new Dimension(500 , 500));
@@ -29,7 +31,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 
 	public void startGame() {
-		double MINSPEED = 0.4;
+		double MINSPEED = 0.1;
 		double MAXSPEED = rand.nextInt(6) + 4;
 		double SIZE = rand.nextInt(UNIT_SIZE/2) + UNIT_SIZE;
 
@@ -38,14 +40,15 @@ public class GamePanel extends JPanel implements ActionListener{
 		mappa = new ImageIcon("../texture_packs/background.jpeg").getImage();
 
 		player = new Player(new Vec2d((int)(UNIT_SIZE), (int)(UNIT_SIZE)) , new Vec2d(0,0), new Vec2d(0,0)
-						, UNIT_SIZE, 10, MINSPEED);
+						, UNIT_SIZE, 10, MINSPEED, 600);
 
 		enemies.clear();
+		bullets.clear();
 		for(int i = 0 ; i < num_enemies; i++){
 			SIZE = rand.nextInt((int)UNIT_SIZE/2) + (int)UNIT_SIZE/2;
 			MAXSPEED = rand.nextInt(5) + 3;
 			enemies.add(new Enemy(new Vec2d(rand.nextInt(mappa.getWidth(null)*10), rand.nextInt(mappa.getHeight(null)*10)), 
-						new Vec2d(0,0), new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED));
+						new Vec2d(0,0), new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, 300));
 		}
 
 		System.out.println("game started");
@@ -67,18 +70,36 @@ public class GamePanel extends JPanel implements ActionListener{
 			player.move(P_up, P_down, P_left, P_right);
 			camera.follow(player.getCenter(), getHeight(), getWidth());
 			player.checkCollisions(player, enemies, mappa);
+			player.reloading = player.reloading - 1;
 			//enemies.add(bird);
 
-			for(int i = 0 ; i < num_enemies; i++){
+			for(int i = 0 ; i < enemies.size(); i++){
+				enemies.get(i).fire(bullets, player.getCenter(), BULLET_SPEED);
+				enemies.get(i).reloading = enemies.get(i).reloading - 1;
 				enemies.get(i).pathFinding(player, enemies);
 				enemies.get(i).checkCollisions(player, enemies, mappa);
 				enemies.get(i).move();
+			}
+
+			int i = 0;
+			while(i < bullets.size()){
+				if(bullets.get(i).checkCollisions(mappa, player))
+					bullets.remove(i);
+				else{
+					bullets.get(i).move();
+					i++;
+				}
 			}
 
 			//enemies.remove(enemies.size-1);
 
 			//disegna la mappa
 			g.drawImage(mappa, -(int)camera.pos.x, -(int)camera.pos.y, mappa.getWidth(null)*10, mappa.getHeight(null)*10, this);
+
+			for (Bullet bullet : bullets){
+				g.setColor(Color.black);
+				g.fillOval((int)bullet.pos.x - (int)camera.pos.x, (int)bullet.pos.y - (int)camera.pos.y, (int)bullet.size, (int)bullet.size);
+			}		
 
 			for (Enemy enemy : enemies){
 				g.setColor(Color.green);
@@ -115,10 +136,11 @@ public class GamePanel extends JPanel implements ActionListener{
 	public class MyMouseListener extends MouseAdapter{
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if (e.getX() < 500 && e.getY() < 500){
-				game_running = true;
-				timer.start();
-			}
+			Vec2d click_pos = new Vec2d(e.getX(), e.getY()); 
+			click_pos.add(camera.pos);
+			player.fire(bullets, click_pos, BULLET_SPEED);
+			game_running = true;
+			timer.start();
 		}
 	}
 	

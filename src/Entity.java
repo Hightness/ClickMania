@@ -5,20 +5,34 @@ import java.util.Random;
 import java.util.ArrayList;
 
 public class Entity{
+	private final int MAX_BULLETS = 200;
     protected double cattrito = 0.04;
     protected double MAXSPEED = 10;
     protected double MINSPEED = 0.4;
+	protected double attackArea = 300;
+	public int reloading = 0;
     public Vec2d pos, speed, acc;
     public double size;
 
-	Entity(Vec2d pos, Vec2d speed, Vec2d acc, double size, double MAXSPEED, double MINSPEED){
+	Entity(Vec2d pos, Vec2d speed, Vec2d acc, double size, double MAXSPEED, double MINSPEED, double attackArea){
         this.MAXSPEED = MAXSPEED;
+        this.attackArea = attackArea;
         this.MINSPEED = MINSPEED;
         this.speed = speed;
         this.acc = acc;
         this.pos = pos;
         this.size = size;
     }
+
+	public void fire(ArrayList<Bullet> bullets, Vec2d bullet_target, double BULLET_SPEED){
+		if(reloading <= 0 && bullets.size() < MAX_BULLETS && getCenter().distance(bullet_target) < attackArea + size/2){
+			Vec2d bullet_speed = getCenter().getDirection(bullet_target).getVersor(MINSPEED);
+			bullet_speed.multiply(BULLET_SPEED);
+			Bullet player_bullet = new Bullet(getCenter(), bullet_speed, this);
+			bullets.add(player_bullet);
+			reloading = 50;
+		}
+	}
 
 	public void checkCollisions(Player player, ArrayList<Enemy> entities, Image mappa) {
 		double distanza_target;
@@ -42,7 +56,7 @@ public class Entity{
 
 			distanza_target = entity.getCenter().distance(getCenter()) - entity.size/2 - this.size/2;
 
-			repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor();
+			repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
 
 			repulsion_vector.multiply(Math.pow((repulsion_radius_ee/distanza_target),2));
 
@@ -52,7 +66,7 @@ public class Entity{
 		//Collision with player
 		if (player.pos.x != this.pos.x || player.pos.y != this.pos.y){
 			distanza_target = getCenter().distance(player.getCenter()) - this.size/2 - player.size/2;
-			repulsion_vector = player.getCenter().getDirection(getCenter()).getVersor();
+			repulsion_vector = player.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
 			repulsion_vector.multiply(Math.pow((repulsion_radius_ep/distanza_target),2));
 			new_dir.add(repulsion_vector);
 			this.acc = speed.clone();
