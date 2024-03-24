@@ -12,6 +12,9 @@ import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 import java.io.File;
 import javafx.embed.swing.JFXPanel;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 
 
@@ -21,6 +24,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	static final int DELAY = 20;
 	static final int BULLET_SPEED = 20;
 	static final int MAX_BULLETS = 950;
+	private Clip musicamainmenu;
 	Player player;
 	int P_up, P_down, P_left, P_right, num_enemies = 100;
 	boolean game_running = false;
@@ -132,6 +136,15 @@ public class GamePanel extends JPanel implements ActionListener{
 		this.setBackground(Color.black);
 		g.setColor(Color.red);
 		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
+		try {
+            File file = new File("C:\\Users\\franc\\Documents\\GitHub\\ClickMania\\music\\lightbringer.WAV");
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+            musicamainmenu = AudioSystem.getClip();
+            musicamainmenu.open(audioInputStream);
+            musicamainmenu.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 
 	public void gameOver(Graphics g) {
