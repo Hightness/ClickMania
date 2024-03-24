@@ -15,20 +15,21 @@ import javafx.embed.swing.JFXPanel;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 
 
 public class GamePanel extends JPanel implements ActionListener{
 
-	static final int DELAY = 20;
-	static final int MAX_BULLETS = 500;
 	Clip musicamainmenu;
 	Player player;
-	int P_up, P_down, P_left, P_right;
+	int P_up, P_down, P_left, P_right, DELAY, MAX_BULLETS, num_enemy_archers, num_enemy_tanks;
 	boolean game_running;
 	Map map;
 	Camera camera;
-	Timer timer = new Timer(DELAY,this);
+	Timer timer;
 	Random rand = new Random();
 	ArrayList<Enemy> enemies = new ArrayList<>();
 	ArrayList<Bullet> bullets = new ArrayList<>();
@@ -52,7 +53,21 @@ public class GamePanel extends JPanel implements ActionListener{
         } catch (Exception e) {
 			System.out.println("Error with playing sound.");
         }
+		try{
+			Properties prop = new Properties();
+			FileInputStream fis = new FileInputStream("C:\\Users\\aiman\\Desktop\\clickmania\\conf\\game_settings.properties");
+			prop.load(fis);
+ 			fis.close();
+			DELAY = Integer.parseInt(prop.getProperty("DELAY"));
+			MAX_BULLETS = Integer.parseInt(prop.getProperty("MAX_BULLETS"));
+			num_enemy_archers = Integer.parseInt(prop.getProperty("num_enemy_archers"));
+			num_enemy_tanks = Integer.parseInt(prop.getProperty("num_enemy_tanks"));
+			System.out.println(DELAY + " " + MAX_BULLETS + " " + num_enemy_archers + " " + num_enemy_tanks);
+		}catch(IOException e){
+			System.out.println("Error with loading properties.");
+		}
 
+		timer = new Timer(DELAY, this);
 		camera = new Camera(new Vec2d(0,0));
 		P_up = P_down = P_left = P_right = 0;
 		map = new Map(new ImageIcon("../texture_packs/background.jpeg").getImage()); 
@@ -61,10 +76,10 @@ public class GamePanel extends JPanel implements ActionListener{
 		enemies.clear();
 		bullets.clear();
 
-		for(int i = 0 ; i < 360; i++)
+		for(int i = 0 ; i < num_enemy_archers; i++)
 			enemies.add(new Enemy(1, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
 
-		for(int i = 0 ; i < 20; i++)
+		for(int i = 0 ; i < num_enemy_tanks; i++)
 			enemies.add(new Enemy(3, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
 	}
 
@@ -100,8 +115,6 @@ public class GamePanel extends JPanel implements ActionListener{
 					i++;
 				}
 			}
-
-			//enemies.remove(enemies.size-1);
 
 			//disegna la background
 			g.drawImage(map.background, -(int)camera.pos.x, -(int)camera.pos.y, map.background.getWidth(null)*10, map.background.getHeight(null)*10, this);

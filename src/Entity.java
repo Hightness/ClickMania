@@ -2,6 +2,9 @@ import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 public class Entity{
     protected double cattrito, MAXSPEED, MINSPEED, attackArea;
@@ -14,96 +17,57 @@ public class Entity{
     public double size;
 
 	Entity(int type, Vec2d pos, Vec2d speed){
+		String filename = "C:\\Users\\aiman\\Desktop\\clickmania\\conf\\";
 		switch(type){
 			case 0:
-				player(pos, speed);
+				filename += "player.properties";
+				type = 0;
 				break;
 			case 1:
-				enemy_archer(pos, speed);
+				filename += "enemy_archer.properties";
+				type = 1;
 				break;
 			case 2:
-				bullet(pos, speed);
+				filename += "bullet.properties";
+				type = 2;
 				break;
 			case 3:
-				enemy_tank(pos, speed);
+				filename += "enemy_tank.properties";
+				type = 3;
 				break;
 			case 4:
-				camera(pos);
-				break;
+				filename += "camera.properties";
+				type = 4;
+				break;}
+
+		try{
+			Properties prop = new Properties();
+        	FileInputStream fis = new FileInputStream(filename);
+        	prop.load(fis);
+        	fis.close();
+			cattrito = Double.parseDouble(prop.getProperty("cattrito"));
+			MAXSPEED = Double.parseDouble(prop.getProperty("MAXSPEED"));
+			MINSPEED = Double.parseDouble(prop.getProperty("MINSPEED"));
+			repulsion_radius = Integer.parseInt(prop.getProperty("repulsion_radius"));
+			attackArea = Double.parseDouble(prop.getProperty("attackArea"));
+			reloading = Integer.parseInt(prop.getProperty("reloading"));
+			reloading_speed = Integer.parseInt(prop.getProperty("reloading_speed"));
+			size = Double.parseDouble(prop.getProperty("size"));
+			acc = new Vec2d(0, 0);
+			String c = prop.getProperty("color");
+			if(c.equals("red"))color = Color.red;
+			if(c.equals("blue"))color = Color.blue;
+			if(c.equals("green"))color = Color.green;
+			if(c.equals("black"))color = Color.black;
 		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+
+
+		this.pos = pos.clone();
+		this.speed = speed.clone();
     }
-
-	private void enemy_tank(Vec2d pos, Vec2d speed){
-		type = 3;
-		cattrito = 0.1;
-		MAXSPEED = 3;
-		repulsion_radius = 3;
-		MINSPEED = 0.1;
-		attackArea = 50;
-		reloading = 0;
-		reloading_speed = 100;
-		color = Color.blue;
-		this.pos = pos.clone();
-		this.speed = speed.clone();
-		acc = new Vec2d(0, 0);
-		size = 40;
-	};
-
-	private void enemy_archer(Vec2d pos, Vec2d speed){
-		type = 1;
-		cattrito = 0.1;
-		MAXSPEED = 6;
-		repulsion_radius = 10;
-		MINSPEED = 0.1;
-		attackArea = 250;
-		reloading = 0;
-		reloading_speed = 10;
-		color = Color.green;
-		this.pos = pos.clone();
-		this.speed = speed.clone();
-		acc = new Vec2d(0, 0);
-		size = 30;
-	};
-
-	private void player(Vec2d pos, Vec2d speed){
-		type = reloading = 0;
-		cattrito = 0.1;
-		MAXSPEED = 10;
-		repulsion_radius = 1;
-		MINSPEED = 0.4;
-		attackArea = 500;
-		reloading_speed = 5;
-		color = Color.red;
-		this.pos = pos.clone();
-		this.speed = speed.clone();
-		acc = new Vec2d(0, 0);
-		size = 50;
-	};
-
-	private void camera(Vec2d pos){
-		type = 4;
-		repulsion_radius = 0;
-		cattrito = MAXSPEED = MINSPEED = attackArea = reloading = reloading_speed = 0;
-		color = Color.black;
-		this.pos = pos.clone();
-		speed = new Vec2d(0, 0);
-		acc = new Vec2d(0, 0);
-		size = 0;
-	};
-
-	private void bullet(Vec2d pos, Vec2d speed){
-		type = 2;
-		cattrito = 0.005;
-		MAXSPEED = 27;
-		MINSPEED = 2;
-		repulsion_radius = 0;
-		attackArea = reloading = reloading_speed = 0;
-		color = Color.black;
-		this.pos = pos.clone();
-		this.speed = speed.clone();
-		acc = new Vec2d(0, 0);
-		size = 10;
-	};
 
 	public void fire(ArrayList<Bullet> bullets, Vec2d bullet_target, int MAX_BULLETS){
 		if(reloading <= 0 && bullets.size() < MAX_BULLETS && getCenter().distance(bullet_target) < attackArea + size/2){
@@ -131,20 +95,21 @@ public class Entity{
 			//double repulsion_vector_weight = Math.pow(eepulsion_radius/distanza_nemici, 2);
 			double repulsion_vector_weight = 2*(sigmoid(Math.pow((repulsion_radius/distanza_nemici), 2)) - 0.5);
 			Vec2d repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
-			Vec2d entity_speed_dir = entity.speed.getVersor(MINSPEED);
-			entity_speed_dir.multiply(repulsion_vector_weight*MAXSPEED/2);
-			repulsion_vector.multiply(repulsion_vector_weight*MAXSPEED/2);
-			repulsion_vector.add(entity_speed_dir);
+			//Vec2d entity_speed_dir = entity.speed.getVersor(MINSPEED);
+			//entity_speed_dir.multiply(repulsion_vector_weight*MAXSPEED/2);
+			repulsion_vector.multiply(repulsion_vector_weight*MAXSPEED);
+			//repulsion_vector.add(entity_speed_dir);
 			new_dir.add(repulsion_vector);
 		}
 
 		//Collision with player
-		if (type != 0){
+		if (player != this){
 			double distanza_player = getCenter().distance(player.getCenter()) - this.size/2 - player.size/2;
 			double repulsion_player_weight = 2*(sigmoid(Math.pow((attackArea/distanza_player), 2)) - 0.5);
 			Vec2d repulsion_vector = player.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
-			new_dir.multiply(1 - repulsion_player_weight);
+			new_dir.multiply((1 - repulsion_player_weight)*MAXSPEED);
 			repulsion_vector.multiply(repulsion_player_weight*MAXSPEED);
+			//System.out.println(repulsion_vector.x + " " + repulsion_vector.y);
 			new_dir.add(repulsion_vector);
 			this.acc.add(new_dir);
 			this.acc.normalize(MAXSPEED);
@@ -187,15 +152,13 @@ public class Entity{
     }
 
 	public void move(){
-        speed.x = speed.x + acc.x;
-        speed.y = speed.y + acc.y;
-
+		speed.add(acc);
         speed.normalize(MAXSPEED);
 
-		Vec2d friction = new Vec2d(-cattrito * speed.x, -cattrito*speed.y);
+		Vec2d friction = speed.clone();
+		friction.multiply(-cattrito);
 
-        speed.x += friction.x;
-        speed.y += friction.y;
+		speed.add(friction);
 
 		if (Math.abs(speed.x) < MINSPEED)speed.x = 0;
 		if (Math.abs(speed.y) < MINSPEED)speed.y = 0;
