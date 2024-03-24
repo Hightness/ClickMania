@@ -64,18 +64,6 @@ public class GamePanel extends JPanel implements ActionListener{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-<<<<<<< HEAD
-=======
-	public void mainMenu(Graphics g){
-		this.setBackground(Color.black);
-		g.setColor(Color.red);
-		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
-
-		
-	}
-
-	public void draw(Graphics g) {
->>>>>>> d9a0a7244671db4527b3117abc8e84b25a3cf65e
 		if(game_running) {
 			player.checkCollisions(player, map, enemies, -1);
 			player.move(P_up, P_down, P_left, P_right);
