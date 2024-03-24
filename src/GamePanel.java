@@ -15,24 +15,14 @@ import javafx.embed.swing.JFXPanel;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-<<<<<<< HEAD
-=======
-
->>>>>>> 0f99bcff29a8422de67f6a7e45631de3e0e2de64
 
 
 
 public class GamePanel extends JPanel implements ActionListener{
 
 	static final int DELAY = 20;
-<<<<<<< HEAD
 	static final int MAX_BULLETS = 500;
 	Clip musicamainmenu;
-=======
-	static final int BULLET_SPEED = 20;
-	static final int MAX_BULLETS = 950;
-	private Clip musicamainmenu;
->>>>>>> 0f99bcff29a8422de67f6a7e45631de3e0e2de64
 	Player player;
 	int P_up, P_down, P_left, P_right;
 	boolean game_running;
@@ -140,20 +130,10 @@ public class GamePanel extends JPanel implements ActionListener{
 		g.setColor(Color.red);
 		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
 		try {
-<<<<<<< HEAD
 			if(!musicamainmenu.isRunning())
             	musicamainmenu.start();
         } catch (Exception e) {
 			System.out.println("Error with playing sound.");
-=======
-            File file = new File("music/lightbringer.WAV");
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
-            musicamainmenu = AudioSystem.getClip();
-            musicamainmenu.open(audioInputStream);
-            musicamainmenu.start();
-        } catch (Exception e) {
-            e.printStackTrace();
->>>>>>> 0f99bcff29a8422de67f6a7e45631de3e0e2de64
         }
 	}
 
