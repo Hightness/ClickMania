@@ -12,6 +12,8 @@ import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 import java.io.File;
 import javafx.embed.swing.JFXPanel;
+
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -23,6 +25,7 @@ import java.util.Properties;
 
 public class GamePanel extends JPanel implements ActionListener{
 
+	
 	Clip musicamainmenu;
 	Player player;
 	int P_up, P_down, P_left, P_right, DELAY, MAX_BULLETS, MAP_PADDING, num_enemy_archers, num_enemy_tanks;
@@ -34,6 +37,11 @@ public class GamePanel extends JPanel implements ActionListener{
 	ArrayList<Enemy> enemies = new ArrayList<>();
 	ArrayList<Bullet> bullets = new ArrayList<>();
 	ArrayList<Bomb> bombs = new ArrayList<>();
+	
+	private int currentImageIndex;
+	private Image[] images;
+	private int delayBetweenImages;
+	private Timer timer1;
 
 	GamePanel(){
 		this.setPreferredSize(new Dimension(500 , 500));
@@ -113,6 +121,17 @@ public class GamePanel extends JPanel implements ActionListener{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
+		// Disegna l'immagine corrente sul pannello
+		if (images != null && images.length > 0) {
+			Image currentImage = images[currentImageIndex];
+			if (currentImage != null) {
+				g.drawImage(currentImage, 50, 50, getWidth(), getHeight(), this);
+			}
+		}
+
+		
+		
+
 		if(game_running) {
 			player.checkCollisions(player, map);
 			player.reloading = player.reloading - 1;
@@ -176,6 +195,7 @@ public class GamePanel extends JPanel implements ActionListener{
 			g.fillOval((int)player.pos.x - (int)camera.pos.x, (int)player.pos.y - (int)camera.pos.y, (int)player.size, (int)player.size);
 		}
 		else {
+			 
 			mainMenu(g);
 			timer.stop();			
 		}
@@ -183,11 +203,84 @@ public class GamePanel extends JPanel implements ActionListener{
 
 	public void mainMenu(Graphics g){
 		this.setBackground(Color.black);
-		g.setColor(Color.red);
-		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
+
+		
+		
+		
+		
+		currentImageIndex = 0;
+        delayBetweenImages = 50; // Tempo di visualizzazione predefinito per ogni immagine (2 secondi)
+
+        // Carica le immagini
+        images = new Image[50]; 
+        images[0] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-001");
+		images[1] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-002");
+		images[2] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-003");
+		images[3] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-004");
+		images[4] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-005");
+		images[5] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-006");
+		images[6] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-007");
+		images[7] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-008");
+		images[8] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-009");
+		images[9] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-010");
+		images[10] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-011");
+		images[11] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-012");
+		images[12] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-013");
+		images[13] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-014");
+		images[14] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-015");
+		images[15] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-016");
+		images[16] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-017");
+		images[17] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-018");
+		images[18] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-019");
+		images[19] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-020");
+		images[20] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-021");
+		images[21] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-022");
+		images[22] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-023");
+		images[23] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-024");
+		images[24] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-025");
+		images[25] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-026");
+		images[26] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-027");
+		images[27] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-028");
+		images[28] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-029");
+		images[29] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-030");
+		images[30] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-031");
+		images[31] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-032");
+		images[32] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-033");
+		images[33] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-034");
+		images[34] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-035");
+		images[35] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-036");
+		images[36] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-037");
+		images[37] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-038");
+		images[38] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-039");
+		images[39] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-040");
+		images[40] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-041");
+		images[41] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-042");
+		images[42] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-043");
+		images[43] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-044");
+		images[44] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-045");
+		images[45] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-046");
+		images[46] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-047");
+		images[47] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-048");
+		images[48] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-049");
+		images[49] = Toolkit.getDefaultToolkit().getImage("../texture_packs/ezgif-5-30d7aa09e1-png-split/ezgif-frame-050");
+		
+		// Avvia il timer per cambiare le immagini
+		timer1 = new Timer(delayBetweenImages, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Timer action performed");
+				currentImageIndex = (currentImageIndex + 1) % images.length;
+				repaint(); // Ridisegna il pannello per visualizzare la nuova immagine
+			}
+		});
+		timer1.start();
+			
+
+		
 		try {
 			if(!musicamainmenu.isRunning())
             	musicamainmenu.start();
+			
         } catch (Exception e) {
 			System.out.println("Error with playing sound.");
         }
