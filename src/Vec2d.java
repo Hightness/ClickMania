@@ -9,7 +9,7 @@ public class Vec2d {
         this.y = y;
 	}
 
-    public double distance(Vec2d vector){// trova distanza di x da y 
+    public double distance(Vec2d vector){// trova distanza x  y 
         return Math.sqrt((vector.x-this.x)*(vector.x-this.x) + (vector.y-this.y)*(vector.y-this.y));
     }
 
@@ -26,6 +26,7 @@ public class Vec2d {
         this.x += vector.x;
         this.y += vector.y;
     }
+
 
     public void flipDirection(){
         this.x = -this.x;

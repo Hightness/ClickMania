@@ -6,15 +6,13 @@ import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements ActionListener{
 
-	static final int UNIT_SIZE = 50;
 	static final int DELAY = 20;
 	static final int BULLET_SPEED = 20;
-	static final int MAX_BULLETS = 150;
-
+	static final int MAX_BULLETS = 950;
 	Player player;
-	int P_up, P_down, P_left, P_right, num_enemies = 15;
+	int P_up, P_down, P_left, P_right, num_enemies = 300;
 	boolean game_running = false;
-	Image mappa;
+	Map map;
 	Camera camera;
 	Timer timer = new Timer(DELAY,this);
 	Random rand = new Random();
@@ -31,59 +29,54 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 
 	public void startGame() {
-		double MINSPEED = 0.1;
-		double MAXSPEED = rand.nextInt(6) + 4;
-		double SIZE = rand.nextInt(UNIT_SIZE/2) + UNIT_SIZE;
+		double MINSPEED = 0.01;
+		double MAXSPEED = rand.nextInt(4) + 7;
+		double enemy_attack_range = 400;
+		double SIZE = rand.nextInt(50/2) + 50;
 
-		camera = new Camera(new Vec2d(0,0), new Vec2d(0,0), new Vec2d(0,0), MAXSPEED, MINSPEED);
+		camera = new Camera(new Vec2d(0,0), new Vec2d(0,0), new Vec2d(0,0), 0, 0);
 		P_up = P_down = P_left = P_right = 0;
-		mappa = new ImageIcon("../texture_packs/background.jpeg").getImage();
-
-		player = new Player(new Vec2d((int)(UNIT_SIZE), (int)(UNIT_SIZE)) , new Vec2d(0,0), new Vec2d(0,0)
-						, UNIT_SIZE, 10, MINSPEED, 600);
+		map = new Map(new ImageIcon("../texture_packs/background.jpeg").getImage()); 
+		player = new Player(new Vec2d((int)(SIZE), (int)(SIZE)), new Vec2d(0,0), new Vec2d(0,0), SIZE, 10, MINSPEED, 900);
 
 		enemies.clear();
 		bullets.clear();
 		for(int i = 0 ; i < num_enemies; i++){
-			SIZE = rand.nextInt((int)UNIT_SIZE/2) + (int)UNIT_SIZE/2;
-			MAXSPEED = rand.nextInt(5) + 3;
-			enemies.add(new Enemy(new Vec2d(rand.nextInt(mappa.getWidth(null)*10), rand.nextInt(mappa.getHeight(null)*10)), 
-						new Vec2d(0,0), new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, 300));
+			SIZE = rand.nextInt((int)50/2) + (int)50/2;
+			MAXSPEED = rand.nextInt(3) + 6;
+			enemies.add(new Enemy(new Vec2d(rand.nextInt(map.background.getWidth(null)*10), rand.nextInt(map.background.getHeight(null)*10)), new Vec2d(0,0),
+			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range));
 		}
-
-		System.out.println("game started");
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		draw(g);
-	}
 
-	public void mainMenu(Graphics g){
-		this.setBackground(Color.black);
-		g.setColor(Color.red);
-		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
-	}
-
-	public void draw(Graphics g) {
 		if(game_running) {
+			player.checkCollisions(player, map, enemies, -1);
 			player.move(P_up, P_down, P_left, P_right);
 			camera.follow(player.getCenter(), getHeight(), getWidth());
-			player.checkCollisions(player, enemies, mappa);
 			player.reloading = player.reloading - 1;
 			//enemies.add(bird);
+			//map.update(player, 0);
 
 			for(int i = 0 ; i < enemies.size(); i++){
 				enemies.get(i).fire(bullets, player.getCenter(), BULLET_SPEED);
 				enemies.get(i).reloading = enemies.get(i).reloading - 1;
 				enemies.get(i).pathFinding(player, enemies);
-				enemies.get(i).checkCollisions(player, enemies, mappa);
-				enemies.get(i).move();
+				enemies.get(i).checkCollisions(player, map, enemies, i+1);
 			}
+
+			for(int i = 0; i < enemies.size(); i++){
+				map.delete(enemies.get(i), i+1);
+				enemies.get(i).move();
+				map.update(enemies.get(i), i+1);
+			}
+			
 
 			int i = 0;
 			while(i < bullets.size()){
-				if(bullets.get(i).checkCollisions(mappa, player))
+				if(bullets.get(i).checkCollisions(map, player))
 					bullets.remove(i);
 				else{
 					bullets.get(i).move();
@@ -93,8 +86,8 @@ public class GamePanel extends JPanel implements ActionListener{
 
 			//enemies.remove(enemies.size-1);
 
-			//disegna la mappa
-			g.drawImage(mappa, -(int)camera.pos.x, -(int)camera.pos.y, mappa.getWidth(null)*10, mappa.getHeight(null)*10, this);
+			//disegna la background
+			g.drawImage(map.background, -(int)camera.pos.x, -(int)camera.pos.y, map.background.getWidth(null)*10, map.background.getHeight(null)*10, this);
 
 			for (Bullet bullet : bullets){
 				g.setColor(Color.black);
@@ -115,9 +108,13 @@ public class GamePanel extends JPanel implements ActionListener{
 		}
 	}
 
-	
+	public void mainMenu(Graphics g){
+		this.setBackground(Color.black);
+		g.setColor(Color.red);
+		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
+	}
+
 	public void gameOver(Graphics g) {
-		//Score
 		System.out.println("gameover");
 		g.setColor(Color.red);
 		g.setFont( new Font("Ink Free",Font.BOLD, 40));
