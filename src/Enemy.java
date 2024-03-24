@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Enemy extends Entity {
 
-	Enemy(int type, Vec2d pos){
+	Enemy(String type, Vec2d pos){
         super(type, pos, new Vec2d(0, 0));
 	}
 

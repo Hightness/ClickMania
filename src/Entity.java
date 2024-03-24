@@ -10,42 +10,25 @@ public class Entity{
     protected double cattrito, MAXSPEED, MINSPEED, attackArea;
 	protected Color color;
 	protected Random rand = new Random();
-	protected int type;
+	protected String type;
 	public boolean counter_clockwise = rand.nextBoolean();
-	public int reloading, reloading_speed, repulsion_radius;
+	public int reloading, reloading_speed, repulsion_radius, knockback_intensity;
     public Vec2d pos, speed, acc;
     public double size;
 
-	Entity(int type, Vec2d pos, Vec2d speed){
-		String filename = "C:\\Users\\aiman\\Desktop\\clickmania\\conf\\";
-		switch(type){
-			case 0:
-				filename += "player.properties";
-				type = 0;
-				break;
-			case 1:
-				filename += "enemy_archer.properties";
-				type = 1;
-				break;
-			case 2:
-				filename += "bullet.properties";
-				type = 2;
-				break;
-			case 3:
-				filename += "enemy_tank.properties";
-				type = 3;
-				break;
-			case 4:
-				filename += "camera.properties";
-				type = 4;
-				break;}
+	Entity(String type, Vec2d pos, Vec2d speed){
+		String filename = "C:\\Users\\aiman\\Desktop\\clickmania\\conf\\"+type+".properties";
+		this.type = type;
+		this.pos = pos.clone();
+		this.speed = speed.clone();
 
 		try{
 			Properties prop = new Properties();
-        	FileInputStream fis = new FileInputStream(filename);
-        	prop.load(fis);
-        	fis.close();
+			FileInputStream fis = new FileInputStream(filename);
+			prop.load(fis);
+ 			fis.close();
 			cattrito = Double.parseDouble(prop.getProperty("cattrito"));
+			knockback_intensity = Integer.parseInt(prop.getProperty("knockback_intensity"));
 			MAXSPEED = Double.parseDouble(prop.getProperty("MAXSPEED"));
 			MINSPEED = Double.parseDouble(prop.getProperty("MINSPEED"));
 			repulsion_radius = Integer.parseInt(prop.getProperty("repulsion_radius"));
@@ -63,8 +46,7 @@ public class Entity{
 		catch(IOException e){
 			e.printStackTrace();
 		}
-		this.pos = pos.clone();
-		this.speed = speed.clone();
+
     }
 
 	public void fire(ArrayList<Bullet> bullets, Vec2d bullet_target, int MAX_BULLETS){
@@ -75,7 +57,7 @@ public class Entity{
 			player_bullet.speed.add(bullet_speed);
 			bullets.add(player_bullet);
 			reloading = reloading_speed;
-		}
+		}else reloading --;
 	}
 
     public double sigmoid(double x){

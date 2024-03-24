@@ -25,7 +25,7 @@ public class GamePanel extends JPanel implements ActionListener{
 
 	Clip musicamainmenu;
 	Player player;
-	int P_up, P_down, P_left, P_right, DELAY, MAX_BULLETS, num_enemy_archers = 0, num_enemy_tanks = 0;
+	int P_up, P_down, P_left, P_right, DELAY, MAX_BULLETS, MAP_PADDING, num_enemy_archers, num_enemy_tanks;
 	boolean game_running;
 	Map map;
 	Camera camera;
@@ -45,21 +45,28 @@ public class GamePanel extends JPanel implements ActionListener{
 
 	public void getData() {
 		try{
+			enemies.clear();
 			Properties prop = new Properties();
 			FileInputStream fis = new FileInputStream("C:\\Users\\aiman\\Desktop\\clickmania\\conf\\game_settings.properties");
 			prop.load(fis);
  			fis.close();
 			DELAY = Integer.parseInt(prop.getProperty("DELAY"));
 			MAX_BULLETS = Integer.parseInt(prop.getProperty("MAX_BULLETS"));
+			MAP_PADDING = Integer.parseInt(prop.getProperty("MAP_PADDING"));
+			map = new Map(new ImageIcon("../texture_packs/background.jpeg").getImage(), MAP_PADDING); 
 			int nnum_enemy_archers = Integer.parseInt(prop.getProperty("num_enemy_archers")) - num_enemy_archers;
 			int nnum_enemy_tanks = Integer.parseInt(prop.getProperty("num_enemy_tanks")) - num_enemy_tanks;
+			timer = new Timer(DELAY, this);
+
 
 			if (nnum_enemy_archers + nnum_enemy_tanks > 0){
-				for(int i = 0 ; i < nnum_enemy_archers; i++)
-					enemies.add(new Enemy(1, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
+				for(int i = 0 ; i < nnum_enemy_archers; i++){
+					enemies.add(new Enemy("enemy_tank", new Vec2d(0, 0)));
+					enemies.add(new Enemy("enemy_archer", new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
+				}
 
 				for(int i = 0 ; i < nnum_enemy_tanks; i++)
-					enemies.add(new Enemy(3, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
+					enemies.add(new Enemy("enemy_tank", new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
 			}
 
 			if (nnum_enemy_archers < 0){
@@ -87,33 +94,26 @@ public class GamePanel extends JPanel implements ActionListener{
 			System.out.println("Error with playing sound.");
         }
 
+		bullets.clear();
 		game_running = false;
 		camera = new Camera(new Vec2d(0,0));
 		P_up = P_down = P_left = P_right = 0;
-		map = new Map(new ImageIcon("../texture_packs/background.jpeg").getImage()); 
 		player = new Player();
 
-		enemies.clear();
-		bullets.clear();
 		getData();
-		timer = new Timer(DELAY, this);
-
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		getData();
 
 		if(game_running) {
 			player.checkCollisions(player, map);
 			player.move(P_up, P_down, P_left, P_right);
 			camera.follow(player.getCenter(), getHeight(), getWidth());
-			player.reloading = player.reloading - 1;
 			//map.update(player, 0);
 
 			for(int i = 0 ; i < enemies.size(); i++){
 				enemies.get(i).fire(bullets, player.getCenter(), MAX_BULLETS);
-				enemies.get(i).reloading = enemies.get(i).reloading - 1;
 				enemies.get(i).pathFinding(player);
 				enemies.get(i).checkCollisions(player, map);
 			}
