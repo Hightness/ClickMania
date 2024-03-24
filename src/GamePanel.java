@@ -61,7 +61,6 @@ public class GamePanel extends JPanel implements ActionListener{
 
 			if (nnum_enemy_archers + nnum_enemy_tanks > 0){
 				for(int i = 0 ; i < nnum_enemy_archers; i++){
-					enemies.add(new Enemy("enemy_tank", new Vec2d(0, 0)));
 					enemies.add(new Enemy("enemy_archer", new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
 				}
 
@@ -86,7 +85,7 @@ public class GamePanel extends JPanel implements ActionListener{
 
 	public void startGame() {
 		try {
-            File file = new File("lightbringer.WAV");
+            File file = new File("../sound/lightbringer.WAV");
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
             musicamainmenu = AudioSystem.getClip();
             musicamainmenu.open(audioInputStream);

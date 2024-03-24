@@ -69,17 +69,18 @@ public class Entity{
 
 		//Collision with enemies
 		ArrayList<Enemy> enemies = mappa.checkCollisions(this);
-		if (enemies.size() > 0)this.counter_clockwise = !this.counter_clockwise;
+		//if (enemies.size() > 0)this.counter_clockwise = !this.counter_clockwise;
 
 		for(Enemy entity : enemies){
+			entity.counter_clockwise = this.counter_clockwise;
 			double distanza_nemici = getCenter().distance(entity.getCenter()) - this.size/2 - entity.size/2;
 			//double repulsion_vector_weight = Math.pow(eepulsion_radius/distanza_nemici, 2);
 			double repulsion_vector_weight = 2*(sigmoid(Math.pow((repulsion_radius/distanza_nemici), 2)) - 0.5);
 			Vec2d repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
-			Vec2d entity_speed_dir = entity.speed.getVersor(MINSPEED);
-			entity_speed_dir.multiply(repulsion_vector_weight*MAXSPEED);
+			//Vec2d entity_speed_dir = entity.speed.getVersor(MINSPEED);
+			//entity_speed_dir.multiply(repulsion_vector_weight*MAXSPEED);
 			repulsion_vector.multiply(repulsion_vector_weight*MAXSPEED);
-			repulsion_vector.add(entity_speed_dir);
+			//repulsion_vector.add(entity_speed_dir);
 			//repulsion_vector.normalize(MAXSPEED);
 			new_dir.add(repulsion_vector);
 		}
@@ -89,7 +90,7 @@ public class Entity{
 			double distanza_player = getCenter().distance(player.getCenter()) - this.size/2 - player.size/2;
 			double repulsion_player_weight = 2*(sigmoid(Math.pow((attackArea/distanza_player), 2)) - 0.5);
 			Vec2d repulsion_vector = player.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
-			new_dir.multiply((1 - repulsion_player_weight)*MAXSPEED);
+			//new_dir.multiply((1 - repulsion_player_weight)*MAXSPEED);
 			repulsion_vector.multiply(repulsion_player_weight*MAXSPEED);
 			//System.out.println(repulsion_vector.x + " " + repulsion_vector.y);
 			new_dir.add(repulsion_vector);
