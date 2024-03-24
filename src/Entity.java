@@ -42,6 +42,7 @@ public class Entity{
 			if(c.equals("blue"))color = Color.blue;
 			if(c.equals("green"))color = Color.green;
 			if(c.equals("black"))color = Color.black;
+			if(c.equals("yellow"))color = Color.yellow;
 		}
 		catch(IOException e){
 			e.printStackTrace();

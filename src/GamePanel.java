@@ -33,6 +33,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	Random rand = new Random();
 	ArrayList<Enemy> enemies = new ArrayList<>();
 	ArrayList<Bullet> bullets = new ArrayList<>();
+	ArrayList<Bomb> bombs = new ArrayList<>();
 
 	GamePanel(){
 		this.setPreferredSize(new Dimension(500 , 500));
@@ -57,6 +58,9 @@ public class GamePanel extends JPanel implements ActionListener{
 			int nnum_enemy_archers = Integer.parseInt(prop.getProperty("num_enemy_archers")) - num_enemy_archers;
 			int nnum_enemy_tanks = Integer.parseInt(prop.getProperty("num_enemy_tanks")) - num_enemy_tanks;
 			timer = new Timer(DELAY, this);
+
+			for(int i = 0 ; i < 10; i++)
+				bombs.add(new Bomb(new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height)), new Vec2d(0, 0), null));
 
 
 			if (nnum_enemy_archers + nnum_enemy_tanks > 0){
@@ -94,8 +98,12 @@ public class GamePanel extends JPanel implements ActionListener{
         }
 
 		bullets.clear();
-		game_running = false;
+		bombs.clear();
+
 		camera = new Camera(new Vec2d(0,0));
+
+
+		game_running = false;
 		P_up = P_down = P_left = P_right = 0;
 		player = new Player();
 
@@ -125,6 +133,18 @@ public class GamePanel extends JPanel implements ActionListener{
 			}
 
 			int i = 0;
+			while(i < bombs.size()){
+				if(bombs.get(i).checkCollisions(map, player)){
+					bombs.remove(i);
+				}
+				else{
+					bombs.get(i).move();
+					i++;
+				}
+			}
+
+
+			i = 0;
 			while(i < bullets.size()){
 				if(bullets.get(i).checkCollisions(map, player))
 					bullets.remove(i);
@@ -136,6 +156,11 @@ public class GamePanel extends JPanel implements ActionListener{
 
 			//disegna la background
 			g.drawImage(map.background, -(int)camera.pos.x, -(int)camera.pos.y, map.background.getWidth(null)*10, map.background.getHeight(null)*10, this);
+
+			for (Bomb bomb : bombs){
+				g.setColor(bomb.color);
+				g.fillOval((int)bomb.pos.x - (int)camera.pos.x, (int)bomb.pos.y - (int)camera.pos.y, (int)bomb.size, (int)bomb.size);
+			}		
 
 			for (Bullet bullet : bullets){
 				g.setColor(bullet.color);
