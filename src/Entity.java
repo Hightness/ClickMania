@@ -72,8 +72,9 @@ public class Entity{
 	public void fire(ArrayList<Bullet> bullets, Vec2d bullet_target, int MAX_BULLETS){
 		if(reloading <= 0 && bullets.size() < MAX_BULLETS && getCenter().distance(bullet_target) < attackArea + size/2){
 			Vec2d bullet_speed = getCenter().getDirection(bullet_target).getVersor(MINSPEED);
-			bullet_speed.multiply(MAXSPEED);
-			Bullet player_bullet = new Bullet(getCenter(), bullet_speed, this);
+			Bullet player_bullet = new Bullet(getCenter(), new Vec2d(0, 0), this);
+			bullet_speed.multiply(player_bullet.MAXSPEED);
+			player_bullet.speed.add(bullet_speed);
 			bullets.add(player_bullet);
 			reloading = reloading_speed;
 		}
@@ -88,9 +89,9 @@ public class Entity{
 
 		//Collision with enemies
 		ArrayList<Enemy> enemies = mappa.checkCollisions(this);
+		if (enemies.size() > 0)this.counter_clockwise = !this.counter_clockwise;
 
 		for(Enemy entity : enemies){
-			if (entity.counter_clockwise != this.counter_clockwise)entity.counter_clockwise = this.counter_clockwise;
 			double distanza_nemici = getCenter().distance(entity.getCenter()) - this.size/2 - entity.size/2;
 			//double repulsion_vector_weight = Math.pow(eepulsion_radius/distanza_nemici, 2);
 			double repulsion_vector_weight = 2*(sigmoid(Math.pow((repulsion_radius/distanza_nemici), 2)) - 0.5);
