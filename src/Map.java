@@ -7,22 +7,30 @@ public class Map{
 	Image background;
     int padding = 200;
 	Entity[][] map; 
+    public int height, width;
 
     Map(Image background){
         this.background = background;
-        this.map = new Entity[background.getHeight(null)*10 + 2*padding][background.getWidth(null)*10 + 2*padding];
+        height = background.getHeight(null)*10;
+        width = background.getWidth(null)*10;
+        map = new Entity[height + 2*padding][width + 2*padding];
     }
 
-    public ArrayList checkCollisions(Entity entity){
+    public ArrayList checkCollisions(Entity entity, int type){
         ArrayList<Entity> entities = new ArrayList<>();
-
-        for (int i = -(int)entity.repulsion_radius; i <= entity.size + (int)entity.repulsion_radius; i++){
-            for (int j = -(int)entity.repulsion_radius; j <= entity.size + (int)entity.repulsion_radius; j++){
+        int max_collisions = 4;
+        for (int i = -entity.repulsion_radius; i <= entity.size + entity.repulsion_radius; i++){
+            for (int j = -entity.repulsion_radius; j <= entity.size + entity.repulsion_radius; j++){
+                if(entities.size() > max_collisions)return entities;
                 Entity e = map[(int)entity.pos.y + i + padding][(int)entity.pos.x + j + padding];
-                if (e != entity && e != null && e.type == entity.type)entities.add(e);
+                if (e != entity && e != null && type == entity.type)entities.add(e);
             }
         }
         return entities;
+    }
+
+    public ArrayList checkCollisions(Entity entity){
+        return checkCollisions(entity, entity.type);
     }
 
     public void update(Entity entity){

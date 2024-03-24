@@ -12,18 +12,20 @@ import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 import java.io.File;
 import javafx.embed.swing.JFXPanel;
-
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 
 
 public class GamePanel extends JPanel implements ActionListener{
 
 	static final int DELAY = 20;
-	static final int BULLET_SPEED = 20;
-	static final int MAX_BULLETS = 950;
+	static final int MAX_BULLETS = 500;
+	Clip musicamainmenu;
 	Player player;
-	int P_up, P_down, P_left, P_right, num_enemies = 100;
-	boolean game_running = false;
+	int P_up, P_down, P_left, P_right;
+	boolean game_running;
 	Map map;
 	Camera camera;
 	Timer timer = new Timer(DELAY,this);
@@ -41,49 +43,45 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 
 	public void startGame() {
-		double MINSPEED = 0.01;
-		double MAXSPEED = rand.nextInt(4) + 7;
-		double enemy_attack_range = 400;
-		double SIZE = rand.nextInt(50/2) + 50;
+		game_running = false;
+		try {
+            File file = new File("lightbringer.WAV");
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+            musicamainmenu = AudioSystem.getClip();
+            musicamainmenu.open(audioInputStream);
+        } catch (Exception e) {
+			System.out.println("Error with playing sound.");
+        }
 
-		camera = new Camera(new Vec2d(0,0), new Vec2d(0,0), new Vec2d(0,0), 0, 0);
+		camera = new Camera(new Vec2d(0,0));
 		P_up = P_down = P_left = P_right = 0;
 		map = new Map(new ImageIcon("../texture_packs/background.jpeg").getImage()); 
-		player = new Player(new Vec2d((int)(SIZE), (int)(SIZE)), new Vec2d(0,0), new Vec2d(0,0), SIZE, 10, MINSPEED, 900);
+		player = new Player();
 
 		enemies.clear();
 		bullets.clear();
 
-		for(int i = 0 ; i < num_enemies; i++){
-			SIZE = rand.nextInt(25) + 25;
-			MAXSPEED = rand.nextInt(3) + 3;
-			enemies.add(new Enemy(new Vec2d(rand.nextInt(map.background.getWidth(null)*10), rand.nextInt(map.background.getHeight(null)*10)), new Vec2d(0,0),
-			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range/10, Color.blue, 1));
-		}
+		for(int i = 0 ; i < 360; i++)
+			enemies.add(new Enemy(1, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
 
-		for(int i = 0 ; i < num_enemies; i++){
-			SIZE = rand.nextInt(25) + 25;
-			MAXSPEED = rand.nextInt(3) + 6;
-			enemies.add(new Enemy(new Vec2d(rand.nextInt(map.background.getWidth(null)*10), rand.nextInt(map.background.getHeight(null)*10)), new Vec2d(0,0),
-			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range, Color.green, 2));
-		}
+		for(int i = 0 ; i < 20; i++)
+			enemies.add(new Enemy(3, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
 		if(game_running) {
-			//player.checkCollisions(player, map);
+			player.checkCollisions(player, map);
 			player.move(P_up, P_down, P_left, P_right);
 			camera.follow(player.getCenter(), getHeight(), getWidth());
 			player.reloading = player.reloading - 1;
-			//enemies.add(bird);
 			//map.update(player, 0);
 
 			for(int i = 0 ; i < enemies.size(); i++){
-				enemies.get(i).fire(bullets, player.getCenter(), BULLET_SPEED);
+				enemies.get(i).fire(bullets, player.getCenter(), MAX_BULLETS);
 				enemies.get(i).reloading = enemies.get(i).reloading - 1;
-				enemies.get(i).pathFinding(player, enemies);
+				enemies.get(i).pathFinding(player);
 				enemies.get(i).checkCollisions(player, map);
 			}
 
@@ -92,7 +90,6 @@ public class GamePanel extends JPanel implements ActionListener{
 				enemies.get(i).move();
 				map.update(enemies.get(i));
 			}
-			
 
 			int i = 0;
 			while(i < bullets.size()){
@@ -132,6 +129,12 @@ public class GamePanel extends JPanel implements ActionListener{
 		this.setBackground(Color.black);
 		g.setColor(Color.red);
 		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
+		try {
+			if(!musicamainmenu.isRunning())
+            	musicamainmenu.start();
+        } catch (Exception e) {
+			System.out.println("Error with playing sound.");
+        }
 	}
 
 	public void gameOver(Graphics g) {
@@ -155,9 +158,14 @@ public class GamePanel extends JPanel implements ActionListener{
 		public void mouseClicked(MouseEvent e) {
 			Vec2d click_pos = new Vec2d(e.getX(), e.getY()); 
 			click_pos.add(camera.pos);
-			player.fire(bullets, click_pos, BULLET_SPEED);
-			game_running = true;
-			timer.start();
+
+			if(!game_running){
+				musicamainmenu.stop();
+				game_running = true;
+				timer.start();
+			}else{
+				player.fire(bullets, click_pos, MAX_BULLETS);
+			}
 		}
 	}
 	
@@ -166,8 +174,11 @@ public class GamePanel extends JPanel implements ActionListener{
 		@Override
 		public void keyPressed(KeyEvent e) {
 			if (e.getKeyCode() == KeyEvent.VK_ENTER){
-				if (!game_running)
+				if (!game_running){
+					musicamainmenu.stop();
 					game_running = true;
+				}
+
 				timer.start();
 			}
 
