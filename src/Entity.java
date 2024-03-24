@@ -7,14 +7,18 @@ public class Entity{
 	private final int MAX_BULLETS = 200;
     protected double cattrito = 0.04;
     protected double MAXSPEED = 10;
-	protected double repulsion_radius = 30;
+	protected double repulsion_radius = 3;
     protected double MINSPEED = 0.4;
 	protected double attackArea = 300;
+	protected Color color = Color.green;
+	protected Random rand = new Random();
+	public boolean counter_clockwise = rand.nextBoolean();
 	public int reloading = 0;
     public Vec2d pos, speed, acc, pd_rotated_versor;
     public double size;
 
-	Entity(Vec2d pos, Vec2d speed, Vec2d acc, double size, double MAXSPEED, double MINSPEED, double attackArea){
+	Entity(Vec2d pos, Vec2d speed, Vec2d acc, double size, double MAXSPEED, double MINSPEED, double attackArea, Color color){
+		this.color = color;
         this.MAXSPEED = MAXSPEED;
         this.attackArea = attackArea;
         this.MINSPEED = MINSPEED;
@@ -44,11 +48,17 @@ public class Entity{
 		//Collision with enemies
 		Set<Integer> tags = mappa.checkCollisions(this, tag);
 		Iterator<Integer> it = tags.iterator();
+		double tot_repulsion_weight = 0;
 
 		while (it.hasNext()){
 			Enemy entity = enemies.get(it.next()-1);
+			if (entity.counter_clockwise != this.counter_clockwise){
+				entity.counter_clockwise = this.counter_clockwise;
+			}
 			double distanza_nemici = getCenter().distance(entity.getCenter()) - this.size/2 - entity.size/2;
-			double repulsion_vector_weight = 2*(sigmoid(Math.pow(repulsion_radius/distanza_nemici, 2)) - 0.5);
+			//double repulsion_vector_weight = Math.pow(repulsion_radius/distanza_nemici, 2);
+			double repulsion_vector_weight = 2*(sigmoid(Math.pow((repulsion_radius/distanza_nemici), 2)) - 0.5);
+			tot_repulsion_weight += repulsion_vector_weight;
 			Vec2d repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
 			repulsion_vector.multiply(repulsion_vector_weight*MAXSPEED);
 			new_dir.add(repulsion_vector);
@@ -58,38 +68,46 @@ public class Entity{
 		if (player.pos.x != this.pos.x || player.pos.y != this.pos.y){
 			double distanza_player = getCenter().distance(player.getCenter()) - this.size/2 - player.size/2;
 			double repulsion_player_weight = 2*(sigmoid(Math.pow((attackArea/distanza_player), 2)) - 0.5);
+			tot_repulsion_weight += repulsion_player_weight;
 			Vec2d repulsion_vector = player.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
 			repulsion_vector.multiply(repulsion_player_weight*MAXSPEED);
-			//new_dir.multiply((1-repulsion_player_weight)*MAXSPEED);
 			new_dir.add(repulsion_vector);
-			this.acc.multiply(0.8);
+			new_dir = new_dir.getVersor(MINSPEED);
+			new_dir.multiply(tot_repulsion_weight);
+			this.acc = this.acc.getVersor(MINSPEED);
+			this.acc.multiply(tags.size() + 1 - tot_repulsion_weight);
 			this.acc.add(new_dir);
-			this.acc.normalize(MAXSPEED);
 		}else{
 			this.speed.add(new_dir);
 			this.speed.normalize(MAXSPEED);
 		}
-
-
 		//Collision with walls
 		if(this.pos.y + this.size >= mappa.background.getHeight(null)*10){
 			if(this.speed.y > 0)this.speed.y = -this.speed.y;
 			if(this.acc.y > 0)this.acc.y = -this.acc.y;
+			if(this.pos.x > player.pos.x)this.counter_clockwise = true;
+			if(this.pos.x < player.pos.x) this.counter_clockwise = false;
 		}
 
 		if(this.pos.y <= 0){
 			if(this.speed.y < 0)this.speed.y = -this.speed.y;
 			if(this.acc.y < 0)this.acc.y = -this.acc.y;
+			if(this.pos.x > player.pos.x)this.counter_clockwise = false;
+			if(this.pos.x < player.pos.x) this.counter_clockwise = true;
 		}
 
 		if (this.pos.x <= 0){
 			if(this.speed.x < 0)this.speed.x = -this.speed.x;
 			if(this.acc.x < 0)this.acc.x = -this.acc.x;
+			if(this.pos.y > player.pos.y)this.counter_clockwise = true;
+			if(this.pos.x < player.pos.x) this.counter_clockwise = false;
 		}
 
 		if(this.pos.x + this.size >= mappa.background.getWidth(null)*10){
 			if(this.speed.x > 0)this.speed.x = -this.speed.x;
 			if(this.acc.x > 0)this.acc.x = -this.acc.x;
+			if(this.pos.x > player.pos.x)this.counter_clockwise = false;
+			if(this.pos.x < player.pos.x) this.counter_clockwise = true;
 		}
 	}
 

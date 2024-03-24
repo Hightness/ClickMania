@@ -5,7 +5,7 @@ import java.util.*;
 
 public class Map{
 	Image background;
-    int padding = 100;
+    int padding = 200;
 	int[][] map; 
 
     Map(Image background){
@@ -15,9 +15,12 @@ public class Map{
 
     public Set checkCollisions(Entity entity, int tag){
         Set<Integer> tags = new HashSet<Integer>();
-        for (int i = 0; i <= entity.size; i++){
-            for (int j = 0; j <= entity.size; j++){
-                if (map[(int)entity.pos.y + i + padding][(int)entity.pos.x + j + padding] != 0 && map[(int)entity.pos.y + i + padding][(int)entity.pos.x + j + padding] != tag){
+        ArrayList<Entity> entities = new ArrayList<>();
+
+        for (int i = -(int)entity.repulsion_radius; i <= entity.size + (int)entity.repulsion_radius; i++){
+            for (int j = -(int)entity.repulsion_radius; j <= entity.size + (int)entity.repulsion_radius; j++){
+                int e = map[(int)entity.pos.y + i + padding][(int)entity.pos.x + j + padding];
+                if (e != 0 && e != tag){
                     tags.add(map[(int)entity.pos.y + i + padding][(int)entity.pos.x + j + padding]);
                 }
             }

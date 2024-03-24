@@ -22,7 +22,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	static final int BULLET_SPEED = 20;
 	static final int MAX_BULLETS = 950;
 	Player player;
-	int P_up, P_down, P_left, P_right, num_enemies = 300;
+	int P_up, P_down, P_left, P_right, num_enemies = 100;
 	boolean game_running = false;
 	Map map;
 	Camera camera;
@@ -53,11 +53,19 @@ public class GamePanel extends JPanel implements ActionListener{
 
 		enemies.clear();
 		bullets.clear();
+
+		for(int i = 0 ; i < num_enemies; i++){
+			SIZE = rand.nextInt((int)50/2) + (int)50/2;
+			MAXSPEED = rand.nextInt(3) + 3;
+			enemies.add(new Enemy(new Vec2d(rand.nextInt(map.background.getWidth(null)*10), rand.nextInt(map.background.getHeight(null)*10)), new Vec2d(0,0),
+			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range/10, Color.blue));
+		}
+
 		for(int i = 0 ; i < num_enemies; i++){
 			SIZE = rand.nextInt((int)50/2) + (int)50/2;
 			MAXSPEED = rand.nextInt(3) + 6;
 			enemies.add(new Enemy(new Vec2d(rand.nextInt(map.background.getWidth(null)*10), rand.nextInt(map.background.getHeight(null)*10)), new Vec2d(0,0),
-			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range));
+			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range, Color.green));
 		}
 	}
 
@@ -102,16 +110,16 @@ public class GamePanel extends JPanel implements ActionListener{
 			g.drawImage(map.background, -(int)camera.pos.x, -(int)camera.pos.y, map.background.getWidth(null)*10, map.background.getHeight(null)*10, this);
 
 			for (Bullet bullet : bullets){
-				g.setColor(Color.black);
+				g.setColor(bullet.color);
 				g.fillOval((int)bullet.pos.x - (int)camera.pos.x, (int)bullet.pos.y - (int)camera.pos.y, (int)bullet.size, (int)bullet.size);
 			}		
 
 			for (Enemy enemy : enemies){
-				g.setColor(Color.green);
+				g.setColor(enemy.color);
 				g.fillOval((int)enemy.pos.x - (int)camera.pos.x, (int)enemy.pos.y - (int)camera.pos.y, (int)enemy.size, (int)enemy.size);
 			}		
 
-			g.setColor(Color.red);
+			g.setColor(player.color);
 			g.fillOval((int)player.pos.x - (int)camera.pos.x, (int)player.pos.y - (int)camera.pos.y, (int)player.size, (int)player.size);
 		}
 		else {
