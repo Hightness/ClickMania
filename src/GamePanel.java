@@ -137,7 +137,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		g.setColor(Color.red);
 		g.fillRect(50,50, 50+getWidth()/10, 50+getHeight()/10);
 		try {
-            File file = new File("C:\\Users\\franc\\Documents\\GitHub\\ClickMania\\music\\lightbringer.WAV");
+            File file = new File("music/lightbringer.WAV");
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
             musicamainmenu = AudioSystem.getClip();
             musicamainmenu.open(audioInputStream);
