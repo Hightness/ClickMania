@@ -55,17 +55,17 @@ public class GamePanel extends JPanel implements ActionListener{
 		bullets.clear();
 
 		for(int i = 0 ; i < num_enemies; i++){
-			SIZE = rand.nextInt((int)50/2) + (int)50/2;
+			SIZE = rand.nextInt(25) + 25;
 			MAXSPEED = rand.nextInt(3) + 3;
 			enemies.add(new Enemy(new Vec2d(rand.nextInt(map.background.getWidth(null)*10), rand.nextInt(map.background.getHeight(null)*10)), new Vec2d(0,0),
-			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range/10, Color.blue));
+			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range/10, Color.blue, 1));
 		}
 
 		for(int i = 0 ; i < num_enemies; i++){
-			SIZE = rand.nextInt((int)50/2) + (int)50/2;
+			SIZE = rand.nextInt(25) + 25;
 			MAXSPEED = rand.nextInt(3) + 6;
 			enemies.add(new Enemy(new Vec2d(rand.nextInt(map.background.getWidth(null)*10), rand.nextInt(map.background.getHeight(null)*10)), new Vec2d(0,0),
-			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range, Color.green));
+			 								new Vec2d(0,0), SIZE, MAXSPEED, MINSPEED, enemy_attack_range, Color.green, 2));
 		}
 	}
 
@@ -73,7 +73,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		super.paintComponent(g);
 
 		if(game_running) {
-			player.checkCollisions(player, map, enemies, -1);
+			//player.checkCollisions(player, map);
 			player.move(P_up, P_down, P_left, P_right);
 			camera.follow(player.getCenter(), getHeight(), getWidth());
 			player.reloading = player.reloading - 1;
@@ -84,13 +84,13 @@ public class GamePanel extends JPanel implements ActionListener{
 				enemies.get(i).fire(bullets, player.getCenter(), BULLET_SPEED);
 				enemies.get(i).reloading = enemies.get(i).reloading - 1;
 				enemies.get(i).pathFinding(player, enemies);
-				enemies.get(i).checkCollisions(player, map, enemies, i+1);
+				enemies.get(i).checkCollisions(player, map);
 			}
 
 			for(int i = 0; i < enemies.size(); i++){
-				map.delete(enemies.get(i), i+1);
+				map.delete(enemies.get(i));
 				enemies.get(i).move();
-				map.update(enemies.get(i), i+1);
+				map.update(enemies.get(i));
 			}
 			
 

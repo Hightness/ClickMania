@@ -4,9 +4,9 @@ import java.util.Random;
 
 public class Enemy extends Entity {
 
-	Enemy(Vec2d pos, Vec2d speed, Vec2d acc, double size, double MAXSPEED, double MINSPEED, double attackArea, Color color){
-        super(pos, speed, acc, size, MAXSPEED, MINSPEED, attackArea, color);
-		this.repulsion_radius = 30;
+	Enemy(Vec2d pos, Vec2d speed, Vec2d acc, double size, double MAXSPEED, double MINSPEED, double attackArea, Color color, double type){
+        super(pos, speed, acc, size, MAXSPEED, MINSPEED, attackArea, color, type);
+		this.repulsion_radius = 10;
 	}
 
 	public void pathFinding(Player target, ArrayList<Enemy> enemies){

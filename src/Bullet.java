@@ -8,7 +8,7 @@ public class Bullet extends Entity{
     public Entity owner;
 
 	Bullet(Vec2d pos, Vec2d speed, Entity owner){
-        super(pos, speed, new Vec2d(0,0), 10, speed.getModule(), 1, 0, Color.black);
+        super(pos, speed, new Vec2d(0,0), 10, speed.getModule(), 1, 0, Color.black, -1);
         this.owner = owner;
         cattrito = 0.005;
 	}

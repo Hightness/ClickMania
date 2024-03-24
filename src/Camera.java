@@ -3,7 +3,7 @@ import java.awt.Color;
 public class Camera extends Entity{
 
     Camera(Vec2d pos, Vec2d speed, Vec2d acc, double MAXSPEED, double MINSPEED){
-        super(pos,speed,acc,0, MAXSPEED, MINSPEED, 0, Color.black);
+        super(pos,speed,acc,0, MAXSPEED, MINSPEED, 0, Color.black, -1);
     }
 
     public void follow(Vec2d target_center, double SCREEN_HEIGHT, double SCREEN_WIDTH){
