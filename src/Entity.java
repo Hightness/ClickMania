@@ -17,7 +17,7 @@ public class Entity{
     public double size;
 
 	Entity(String type, Vec2d pos, Vec2d speed){
-		String filename = "C:\\Users\\aiman\\Desktop\\clickmania\\conf\\"+type+".properties";
+		String filename = "../conf/"+type+".properties";
 		this.type = type;
 		this.pos = pos.clone();
 		this.speed = speed.clone();

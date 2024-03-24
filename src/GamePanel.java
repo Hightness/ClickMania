@@ -47,7 +47,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		try{
 			enemies.clear();
 			Properties prop = new Properties();
-			FileInputStream fis = new FileInputStream("C:\\Users\\aiman\\Desktop\\clickmania\\conf\\game_settings.properties");
+			FileInputStream fis = new FileInputStream("../conf/game_settings.properties");
 			prop.load(fis);
  			fis.close();
 			DELAY = Integer.parseInt(prop.getProperty("DELAY"));
@@ -108,6 +108,7 @@ public class GamePanel extends JPanel implements ActionListener{
 
 		if(game_running) {
 			player.checkCollisions(player, map);
+			player.reloading = player.reloading - 1;
 			player.move(P_up, P_down, P_left, P_right);
 			camera.follow(player.getCenter(), getHeight(), getWidth());
 			//map.update(player, 0);
