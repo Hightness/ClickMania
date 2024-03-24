@@ -25,7 +25,7 @@ public class GamePanel extends JPanel implements ActionListener{
 
 	Clip musicamainmenu;
 	Player player;
-	int P_up, P_down, P_left, P_right, DELAY, MAX_BULLETS, num_enemy_archers, num_enemy_tanks;
+	int P_up, P_down, P_left, P_right, DELAY, MAX_BULLETS, num_enemy_archers = 0, num_enemy_tanks = 0;
 	boolean game_running;
 	Map map;
 	Camera camera;
@@ -43,8 +43,41 @@ public class GamePanel extends JPanel implements ActionListener{
 		startGame();
 	}
 
+	public void getData() {
+		try{
+			Properties prop = new Properties();
+			FileInputStream fis = new FileInputStream("C:\\Users\\aiman\\Desktop\\clickmania\\conf\\game_settings.properties");
+			prop.load(fis);
+ 			fis.close();
+			DELAY = Integer.parseInt(prop.getProperty("DELAY"));
+			MAX_BULLETS = Integer.parseInt(prop.getProperty("MAX_BULLETS"));
+			int nnum_enemy_archers = Integer.parseInt(prop.getProperty("num_enemy_archers")) - num_enemy_archers;
+			int nnum_enemy_tanks = Integer.parseInt(prop.getProperty("num_enemy_tanks")) - num_enemy_tanks;
+
+			if (nnum_enemy_archers + nnum_enemy_tanks > 0){
+				for(int i = 0 ; i < nnum_enemy_archers; i++)
+					enemies.add(new Enemy(1, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
+
+				for(int i = 0 ; i < nnum_enemy_tanks; i++)
+					enemies.add(new Enemy(3, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
+			}
+
+			if (nnum_enemy_archers < 0){
+				for(int i = 0 ; i < -nnum_enemy_archers; i++)
+					enemies.remove(enemies.size() - 1);
+			}
+			if (nnum_enemy_tanks < 0){
+				for(int i = 0 ; i < -nnum_enemy_tanks; i++)
+					enemies.remove(enemies.size() - 1);
+			}
+
+			num_enemy_archers += nnum_enemy_archers;
+			num_enemy_tanks += nnum_enemy_tanks;
+		}catch(IOException e){
+			System.out.println("Error with loading properties.");
+		}}
+
 	public void startGame() {
-		game_running = false;
 		try {
             File file = new File("lightbringer.WAV");
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
@@ -53,21 +86,8 @@ public class GamePanel extends JPanel implements ActionListener{
         } catch (Exception e) {
 			System.out.println("Error with playing sound.");
         }
-		try{
-			Properties prop = new Properties();
-			FileInputStream fis = new FileInputStream("C:\\Users\\aiman\\Desktop\\clickmania\\conf\\game_settings.properties");
-			prop.load(fis);
- 			fis.close();
-			DELAY = Integer.parseInt(prop.getProperty("DELAY"));
-			MAX_BULLETS = Integer.parseInt(prop.getProperty("MAX_BULLETS"));
-			num_enemy_archers = Integer.parseInt(prop.getProperty("num_enemy_archers"));
-			num_enemy_tanks = Integer.parseInt(prop.getProperty("num_enemy_tanks"));
-			System.out.println(DELAY + " " + MAX_BULLETS + " " + num_enemy_archers + " " + num_enemy_tanks);
-		}catch(IOException e){
-			System.out.println("Error with loading properties.");
-		}
 
-		timer = new Timer(DELAY, this);
+		game_running = false;
 		camera = new Camera(new Vec2d(0,0));
 		P_up = P_down = P_left = P_right = 0;
 		map = new Map(new ImageIcon("../texture_packs/background.jpeg").getImage()); 
@@ -75,16 +95,14 @@ public class GamePanel extends JPanel implements ActionListener{
 
 		enemies.clear();
 		bullets.clear();
+		getData();
+		timer = new Timer(DELAY, this);
 
-		for(int i = 0 ; i < num_enemy_archers; i++)
-			enemies.add(new Enemy(1, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
-
-		for(int i = 0 ; i < num_enemy_tanks; i++)
-			enemies.add(new Enemy(3, new Vec2d(rand.nextInt(map.width), rand.nextInt(map.height))));
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		getData();
 
 		if(game_running) {
 			player.checkCollisions(player, map);

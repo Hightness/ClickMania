@@ -63,8 +63,6 @@ public class Entity{
 		catch(IOException e){
 			e.printStackTrace();
 		}
-
-
 		this.pos = pos.clone();
 		this.speed = speed.clone();
     }
@@ -96,10 +94,11 @@ public class Entity{
 			//double repulsion_vector_weight = Math.pow(eepulsion_radius/distanza_nemici, 2);
 			double repulsion_vector_weight = 2*(sigmoid(Math.pow((repulsion_radius/distanza_nemici), 2)) - 0.5);
 			Vec2d repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
-			//Vec2d entity_speed_dir = entity.speed.getVersor(MINSPEED);
-			//entity_speed_dir.multiply(repulsion_vector_weight*MAXSPEED/2);
+			Vec2d entity_speed_dir = entity.speed.getVersor(MINSPEED);
+			entity_speed_dir.multiply(repulsion_vector_weight*MAXSPEED);
 			repulsion_vector.multiply(repulsion_vector_weight*MAXSPEED);
-			//repulsion_vector.add(entity_speed_dir);
+			repulsion_vector.add(entity_speed_dir);
+			//repulsion_vector.normalize(MAXSPEED);
 			new_dir.add(repulsion_vector);
 		}
 
