@@ -13,10 +13,15 @@ public class Bomb extends Entity{
         //if (tick == 0)return true;
         //tick = tick-1;
 
-        if ((getCenter().distance(player.getCenter()) <= size/2 + player.size/2)&& owner == null)return true;
-
-		if(this.pos.y + this.size >= mappa.background.getHeight(null)*10 || this.pos.y <= 0 || this.pos.x <= 0 || this.pos.x + this.size >= mappa.background.getWidth(null)*10)
+        if ((getCenter().distance(player.getCenter()) <= size/2 + player.size/2)&& owner == null){
+            player.MAXSPEED = player.MAXSPEED*1.2;
+            player.upgrade_animation = 0;
             return true;
+        }
+
+		if(this.pos.y + this.size >= mappa.background.getHeight(null)*10 || this.pos.y <= 0 || this.pos.x <= 0 || this.pos.x + this.size >= mappa.background.getWidth(null)*10){
+            return true;
+        }
 
         return false;
     }

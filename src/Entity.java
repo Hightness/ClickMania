@@ -65,19 +65,18 @@ public class Entity{
         return 1 / (1 + Math.exp(-x));
     }
 
-	public void checkCollisions(Player player, Map mappa) {
+	public void checkCollisions(Player player, Map mappa){
 		Vec2d new_dir = new Vec2d(0, 0);
-
 		//Collision with enemies
-		ArrayList<Enemy> enemies = mappa.checkCollisions(this);
+		ArrayList<Enemy> enemies = mappa.checkCollisions(this,this.type);
 		//if (enemies.size() > 0)this.counter_clockwise = !this.counter_clockwise;
 
 		for(Enemy entity : enemies){
-			entity.counter_clockwise = this.counter_clockwise;
+			//entity.counter_clockwise = this.counter_clockwise;
 			double distanza_nemici = getCenter().distance(entity.getCenter()) - this.size/2 - entity.size/2;
 			//double repulsion_vector_weight = Math.pow(eepulsion_radius/distanza_nemici, 2);
-			double repulsion_vector_weight = 2*(sigmoid(Math.pow((repulsion_radius/distanza_nemici), 2)) - 0.5);
-			Vec2d repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
+			double repulsion_vector_weight = 2*(sigmoid(Math.abs(repulsion_radius/distanza_nemici)) - 0.5);
+			Vec2d repulsion_vector = entity.getCenter().getDirection(getCenter()).getVersor(0);
 			//Vec2d entity_speed_dir = entity.speed.getVersor(MINSPEED);
 			//entity_speed_dir.multiply(repulsion_vector_weight*MAXSPEED);
 			repulsion_vector.multiply(repulsion_vector_weight*MAXSPEED);
@@ -86,48 +85,55 @@ public class Entity{
 			new_dir.add(repulsion_vector);
 		}
 
-		//Collision with player
-		if (player != this){
-			double distanza_player = getCenter().distance(player.getCenter()) - this.size/2 - player.size/2;
-			double repulsion_player_weight = 2*(sigmoid(Math.pow((attackArea/distanza_player), 2)) - 0.5);
-			Vec2d repulsion_vector = player.getCenter().getDirection(getCenter()).getVersor(MINSPEED);
-			//new_dir.multiply((1 - repulsion_player_weight)*MAXSPEED);
-			repulsion_vector.multiply(repulsion_player_weight*MAXSPEED);
-			//System.out.println(repulsion_vector.x + " " + repulsion_vector.y);
-			new_dir.add(repulsion_vector);
-			this.acc.add(new_dir);
-			this.acc.normalize(MAXSPEED);
-		}else{
+		double bottom_wall_opposition_weight = 2*(sigmoid(2000/Math.pow(this.getCenter().distance(new Vec2d(this.getCenter().x, mappa.height)), 2)) - 0.5);
+		double top_wall_opposition_weight = 2*(sigmoid(2000/Math.pow(this.getCenter().distance(new Vec2d(this.getCenter().x, 0)), 2)) - 0.5);
+		double left_wall_opposition_weight = 2*(sigmoid(2000/Math.pow(this.getCenter().distance(new Vec2d(0, this.getCenter().y)), 2)) - 0.5);
+		double right_wall_opposition_weight = 2*(sigmoid(2000/Math.pow(this.getCenter().distance(new Vec2d(mappa.width, this.getCenter().y)), 2)) - 0.5);
+
+		//if is player
+		if (player == this){
 			this.speed.add(new_dir);
 			this.speed.normalize(MAXSPEED);
+
+
+		}else{
+			double	distanza_target = getCenter().distance(player.getCenter()) - this.size/2 - player.size/2;
+			Vec2d player_opposition_vector = player.getCenter().getDirection(getCenter()).getVersor(0);
+			double player_oppositioin_weight = 2*(sigmoid(Math.pow(attackArea/distanza_target, 2)) - 0.5);
+
+			player_opposition_vector.multiply(player_oppositioin_weight*MAXSPEED);
+
+			new_dir.multiply((1-player_oppositioin_weight)*MAXSPEED);
+			this.acc.add(player_opposition_vector);
+			this.acc.x = this.acc.x - right_wall_opposition_weight*MAXSPEED + left_wall_opposition_weight*MAXSPEED;
+			this.acc.y = this.acc.y - bottom_wall_opposition_weight*MAXSPEED + top_wall_opposition_weight*MAXSPEED;
+			this.acc.add(new_dir);
+			this.acc.normalize(MAXSPEED);
 		}
+
 		//Collision with walls
 		if(this.pos.y + this.size >= mappa.background.getHeight(null)*10){
 			if(this.speed.y > 0)this.speed.y = -this.speed.y;
 			if(this.acc.y > 0)this.acc.y = -this.acc.y;
-			if(this.pos.x > player.pos.x)this.counter_clockwise = true;
-			if(this.pos.x < player.pos.x) this.counter_clockwise = false;
+			this.counter_clockwise = !this.counter_clockwise;
 		}
 
 		if(this.pos.y <= 0){
 			if(this.speed.y < 0)this.speed.y = -this.speed.y;
 			if(this.acc.y < 0)this.acc.y = -this.acc.y;
-			if(this.pos.x > player.pos.x)this.counter_clockwise = false;
-			if(this.pos.x < player.pos.x) this.counter_clockwise = true;
+			this.counter_clockwise = !this.counter_clockwise;
 		}
 
 		if (this.pos.x <= 0){
 			if(this.speed.x < 0)this.speed.x = -this.speed.x;
 			if(this.acc.x < 0)this.acc.x = -this.acc.x;
-			if(this.pos.y > player.pos.y)this.counter_clockwise = true;
-			if(this.pos.x < player.pos.x) this.counter_clockwise = false;
+			this.counter_clockwise = !this.counter_clockwise;
 		}
 
 		if(this.pos.x + this.size >= mappa.background.getWidth(null)*10){
 			if(this.speed.x > 0)this.speed.x = -this.speed.x;
 			if(this.acc.x > 0)this.acc.x = -this.acc.x;
-			if(this.pos.x > player.pos.x)this.counter_clockwise = false;
-			if(this.pos.x < player.pos.x) this.counter_clockwise = true;
+			this.counter_clockwise = !this.counter_clockwise;
 		}
 	}
 

@@ -19,7 +19,7 @@ public class Map{
 
     public ArrayList checkCollisions(Entity entity, String type){
         ArrayList<Entity> entities = new ArrayList<>();
-        int max_collisions = 4;
+        int max_collisions = 10;
         for (int i = -entity.repulsion_radius; i <= entity.size + entity.repulsion_radius; i++){
             for (int j = -entity.repulsion_radius; j <= entity.size + entity.repulsion_radius; j++){
                 if(entities.size() > max_collisions)return entities;
