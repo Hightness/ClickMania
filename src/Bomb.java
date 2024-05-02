@@ -1,28 +1,24 @@
+import java.util.ArrayList;
 
 public class Bomb extends Entity{
     public Entity owner;
-    public int tick;
+    public Vec2d destination;
 
-    Bomb(Vec2d pos, Vec2d speed, Entity owner){
+    Bomb(Vec2d pos, Vec2d speed, Entity owner, Vec2d destination){
         super("bomb", pos, speed);
+        this.destination = destination;
         if(owner != null) this.owner = owner;
-        tick = 200;
     }
 
     public boolean checkCollisions(Map mappa, Player player){
-        //if (tick == 0)return true;
-        //tick = tick-1;
+        if (speed.getModule() < MINSPEED)return true;
 
-        if ((getCenter().distance(player.getCenter()) <= size/2 + player.size/2)&& owner == null){
-            player.MAXSPEED = player.MAXSPEED*1.2;
-            player.upgrade_animation = 0;
-            return true;
+        if (this.pos.x == destination.x && this.pos.y == destination.y){
+            ArrayList<Entity> enemies = mappa.checkCollisions(this,this.type);
+            for(Entity e : enemies) e.health --;
+            if ((getCenter().distance(player.getCenter()) <= size/2 + player.size/2)&& owner != player)
+                return true;
         }
-
-		if(this.pos.y + this.size >= mappa.background.getHeight(null)*10 || this.pos.y <= 0 || this.pos.x <= 0 || this.pos.x + this.size >= mappa.background.getWidth(null)*10){
-            return true;
-        }
-
-        return false;
+        return this.pos.y + this.size >= mappa.height || this.pos.y <= 0 || this.pos.x <= 0 || this.pos.x + this.size >= mappa.width;
     }
 }

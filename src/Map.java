@@ -12,19 +12,19 @@ public class Map{
     Map(Image background, int padding){
         this.padding = padding;
         this.background = background;
-        height = background.getHeight(null)*10;
-        width = background.getWidth(null)*10;
-        map = new Entity[height + 2*padding][width + 2*padding];
+        height = background.getHeight(null)*5;
+        width = background.getWidth(null)*5;
+        map = new Entity[height + 3*padding][width + 3*padding];
     }
 
-    public ArrayList checkCollisions(Entity entity, String type){
+    public ArrayList<Entity> checkCollisions(Entity entity, String type){
         ArrayList<Entity> entities = new ArrayList<>();
         int max_collisions = 10;
         for (int i = -entity.repulsion_radius; i <= entity.size + entity.repulsion_radius; i++){
             for (int j = -entity.repulsion_radius; j <= entity.size + entity.repulsion_radius; j++){
                 if(entities.size() > max_collisions)return entities;
                 Entity e = map[(int)entity.pos.y + i + padding][(int)entity.pos.x + j + padding];
-                if (e != entity && e != null && type == entity.type)entities.add(e);
+                if (e != entity && e != null && Objects.equals(e.type, type))entities.add(e);
             }
         }
         return entities;
